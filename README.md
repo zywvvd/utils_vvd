@@ -91,3 +91,18 @@ def cv_rgb_imread(image_path):
     """
 ```
 
+```python
+def dir_exists(dir_path):
+    """
+    check if dir exists
+    """
+```
+
+### 使用方法
+
+> 下载后直接加载即可
+
+```shell
+from utils_vvd.utlis import dir_check
+```
+

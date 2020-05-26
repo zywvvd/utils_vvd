@@ -96,6 +96,14 @@ def log_init(log_path):
     return Loger_printer(logging)
 
 
+def dir_exists(dir_path):
+    """
+    check if dir exists
+    """
+    if not os.path.isdir(dir_path):
+        raise TypeError("dir not found")
+    
+
 def dir_check(dir_path):
     """
     check if `dir_path` is a real directory path
