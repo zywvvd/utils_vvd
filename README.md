@@ -103,6 +103,6 @@ def dir_exists(dir_path):
 > 下载后直接加载即可
 
 ```shell
-from utils_vvd.utlis import dir_check
+from utils_vvd.utils import image_show
 ```
 
