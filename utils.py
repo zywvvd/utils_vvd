@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import json
 import time
+import sys
 import cv2 as cv
 import math
 import logging
@@ -77,6 +78,24 @@ class MyEncoder(json.JSONEncoder):
         else:
             return super(MyEncoder, self).default(obj)
 
+class Sys_Logger(object):
+    
+    def __init__(self, fileN="Default.log"):
+        
+        self.terminal = sys.stdout
+        if OS_exists(fileN):
+            self.log = open(fileN, "a")
+        else:
+            self.log = open(fileN, "w")
+ 
+    def write(self, message):
+        
+        self.terminal.write(message)
+        self.log.write(message)
+ 
+    def flush(self):
+        pass
+
 
 class Loger_printer():
     """
@@ -132,6 +151,8 @@ def log_init(log_path):
         # 打开日志文件的方式
         filemode = open_type
     )    
+    
+    logging.StreamHandler()
     
     return Loger_printer(logging)
 
