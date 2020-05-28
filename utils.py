@@ -17,6 +17,46 @@ import math
 import logging
 import os
 
+def zero_padding(in_array, padding_size_1, padding_size_2, padding_size_3 = None, padding_size_4 = None):
+    """
+    四周补零，以此避免边界判断(仅用于三通道图像)
+    
+    输入：
+    :in_array: 输入矩阵 np.array (rows, cols, 3)
+    
+    (padding_size_3-4 为 None 时)
+    :padding_size_1:  上下补零行数
+    :padding_size_2:  左右补零列数
+    
+    (padding_size_3-4 均不为 None 时)
+    :padding_size_1:  上补零行数
+    :padding_size_2:  下补零列数
+    :padding_size_3:  左补零行数
+    :padding_size_4:  右补零列数
+    
+    输出：
+    :padding_array: 补零后的图像（新建矩阵，不修改原始输入）
+    """
+    
+    assert np.ndim(in_array) == 3
+    
+    rows, cols, ndim = in_array.shape
+     
+    if (padding_size_3 is None)  and (padding_size_4 is None):
+        assert padding_size_1>=0 and padding_size_2>=0
+        
+        padding_array = np.zeros([rows + 2 * padding_size_1, cols + 2 * padding_size_2, ndim], dtype = type(in_array[0][0][0]))
+        padding_array[padding_size_1:rows + padding_size_1, padding_size_2:cols + padding_size_2, :] = in_array
+        
+    else:
+        assert (not padding_size_3 is None) and (not padding_size_4 is None), "padding_size_3 padding_size_4 必须都不是none"
+        assert padding_size_1 >= 0 and padding_size_2 >= 0 and padding_size_3 >= 0 and padding_size_4 >= 0
+        
+        padding_array = np.zeros([rows +  padding_size_1 + padding_size_2, cols +  padding_size_3 +  padding_size_4, ndim], dtype = type(in_array[0][0][0]))
+        padding_array[padding_size_1:rows + padding_size_1, padding_size_3:cols + padding_size_3, :] = in_array
+        
+    return padding_array 
+
 
 class MyEncoder(json.JSONEncoder):
     """
