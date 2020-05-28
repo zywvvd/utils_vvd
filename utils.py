@@ -94,7 +94,7 @@ class Sys_Logger(object):
         self.log.write(message)
  
     def flush(self):
-        pass
+        self.terminal.flush()
 
 
 class Loger_printer():
