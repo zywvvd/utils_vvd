@@ -3,7 +3,11 @@
 #
 
 import os
-from keras.callbacks import LearningRateScheduler,TensorBoard,ModelCheckpoint,Callback
+from keras.callbacks import LearningRateScheduler
+from keras.callbacks import TensorBoard
+from keras.callbacks import ModelCheckpoint
+from keras.callbacks import Callback
+from keras.callbacks import ReduceLROnPlateau
 
 
 class ModelCheckpointAfter(ModelCheckpoint):
@@ -28,7 +32,11 @@ class ModelCheckpointAfter(ModelCheckpoint):
         print(f'logs : {logs}')
         pass
 
+def my_ReduceLROnPlateau(decay_factor, patience, min_lr):
+    
+    lr_reducer = ReduceLROnPlateau(monitor='loss', factor = decay_factor, cooldown=0, patience= patience, min_lr= min_lr)
 
+    return lr_reducer
   
 def model_checkpoint_after(epoch, steps, path, monitor, save_best_only):
     """
