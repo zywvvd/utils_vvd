@@ -28,8 +28,8 @@ class ModelCheckpointAfter(ModelCheckpoint):
             self.index+=1
     
     def on_batch_end(self,batch, logs=None):
-        print(f'batch: {batch}')
-        print(f'logs : {logs}')
+        #print(f'batch: {batch}')
+        #print(f'logs : {logs}')
         pass
 
 def my_ReduceLROnPlateau(decay_factor, patience, min_lr):
