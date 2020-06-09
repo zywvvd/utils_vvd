@@ -17,6 +17,16 @@ import cv2 as cv
 import math
 import logging
 import os
+import platform
+
+from ipdb import set_trace
+
+
+def my_linux_set_trace(debug = False):
+    if debug:
+        Current_System = platform.system()   
+        if Current_System == 'Linux':
+            set_trace()
 
 def zero_padding(in_array, padding_size_1, padding_size_2, padding_size_3 = None, padding_size_4 = None):
     """
