@@ -37,17 +37,31 @@ def my_ReduceLROnPlateau(decay_factor, patience, min_lr):
     lr_reducer = ReduceLROnPlateau(monitor='loss', factor = decay_factor, cooldown=0, patience= patience, min_lr= min_lr)
 
     return lr_reducer
-  
-def model_checkpoint_after(epoch, steps, path, monitor, save_best_only):
+
+class ParallelModelCheckpoint(ModelCheckpointAfter):
+    def __init__(self, model, epoch, steps, filepath, monitor='val_loss', verbose=0,
+                 save_best_only=False, save_weights_only=False,
+                 mode='auto', period=1):
+        self.single_model = model
+        super(ParallelModelCheckpoint,self).__init__(epoch, steps, filepath, monitor, verbose,save_best_only, save_weights_only,mode, period)
+
+    def set_model(self, model):
+        super(ParallelModelCheckpoint,self).set_model(self.single_model)
+
+
+def model_checkpoint_after(epoch, steps, path, monitor, save_best_only, ParallelModel):
     """
     每个epoch结束保存模型
     """
     if not (os.path.exists(path)):
         os.mkdir(path)
     pattern = os.path.join(path, 'epoch-{epoch:03d}-{' + monitor + ':.4f}.h5')
-
-    return ModelCheckpointAfter(epoch, steps, filepath=pattern, monitor=monitor,
-                                save_best_only=save_best_only, mode='max')
+    
+    if ParallelModel:
+        return ParallelModelCheckpoint(ParallelModel, epoch, steps, filepath = pattern, monitor=monitor, save_best_only=save_best_only)
+    else:
+        return ModelCheckpointAfter(epoch, steps, filepath=pattern, monitor=monitor,
+                                save_best_only=save_best_only, mode='auto')
 
 
 class Data_Shuffle(Callback):
