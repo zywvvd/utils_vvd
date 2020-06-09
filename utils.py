@@ -21,6 +21,14 @@ import platform
 
 from ipdb import set_trace
 
+def strong_printing(string):
+    
+    print('######################################################')
+    print()
+    print(string)
+    print()
+    print('######################################################')
+
 
 def my_linux_set_trace(debug = False):
     if debug:
