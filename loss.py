@@ -7,7 +7,8 @@ from keras.metrics import  categorical_crossentropy
 
 
 
-def multi_category_focal_loss2_fixed(y_true, y_pred, gamma = 2., alpha = 0.25):
+def multi_category_focal_loss(y_true, y_pred, gamma = 2., alpha = 0.25):
+    
     epsilon = 1.e-7
     gamma=gamma
     alpha = tf.constant(alpha, dtype=tf.float32)
@@ -31,7 +32,7 @@ if __name__ =='__main__':
     Y_true = np.array([[1, 1, 1, 1, 1, 0, 1, 1, 1, 1]])
     Y_pred = np.array([[0.9, 0.99, 0.8, 0.97, 0.85, 0.9, 0.95, 0.91, 0.99, 1]], dtype=np.float32)
     
-    print(K.eval(multi_category_focal_loss2_fixed(Y_true, Y_pred)))
+    print(K.eval(multi_category_focal_loss(Y_true, Y_pred)))
     
     epsilon = 1.e-7
     
