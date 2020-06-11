@@ -1,8 +1,8 @@
 #
-# vvd Tool functions 
+# vvd Tool functions
 #
 
-## 整合常用os操作
+# 整合常用os操作
 from os.path import basename as OS_basename
 from os.path import join as OS_join
 from os.path import exists as OS_exists
@@ -21,8 +21,9 @@ import platform
 
 from ipdb import set_trace
 
+
 def strong_printing(string):
-    
+
     print('######################################################')
     print()
     print(string)
@@ -30,51 +31,57 @@ def strong_printing(string):
     print('######################################################')
 
 
-def my_linux_set_trace(debug = False):
+def my_linux_set_trace(debug=False):
     if debug:
-        Current_System = platform.system()   
+        Current_System = platform.system()
         if Current_System == 'Linux':
             set_trace()
 
-def zero_padding(in_array, padding_size_1, padding_size_2, padding_size_3 = None, padding_size_4 = None):
+
+def zero_padding(in_array, padding_size_1, padding_size_2, padding_size_3=None, padding_size_4=None):
     """
     四周补零，以此避免边界判断(仅用于三通道图像)
-    
+
     输入：
     :in_array: 输入矩阵 np.array (rows, cols, 3)
-    
+
     (padding_size_3-4 为 None 时)
     :padding_size_1:  上下补零行数
     :padding_size_2:  左右补零列数
-    
+
     (padding_size_3-4 均不为 None 时)
     :padding_size_1:  上补零行数
     :padding_size_2:  下补零列数
     :padding_size_3:  左补零行数
     :padding_size_4:  右补零列数
-    
+
     输出：
     :padding_array: 补零后的图像（新建矩阵，不修改原始输入）
     """
-    
+
     assert np.ndim(in_array) == 3
-    
+
     rows, cols, ndim = in_array.shape
-     
-    if (padding_size_3 is None)  and (padding_size_4 is None):
-        assert padding_size_1>=0 and padding_size_2>=0
-        
-        padding_array = np.zeros([rows + 2 * padding_size_1, cols + 2 * padding_size_2, ndim], dtype = type(in_array[0][0][0]))
-        padding_array[padding_size_1:rows + padding_size_1, padding_size_2:cols + padding_size_2, :] = in_array
-        
+
+    if (padding_size_3 is None) and (padding_size_4 is None):
+        assert padding_size_1 >= 0 and padding_size_2 >= 0
+
+        padding_array = np.zeros(
+            [rows + 2 * padding_size_1, cols + 2 * padding_size_2, ndim], dtype=type(in_array[0][0][0]))
+        padding_array[padding_size_1:rows + padding_size_1,
+                      padding_size_2:cols + padding_size_2, :] = in_array
+
     else:
-        assert (not padding_size_3 is None) and (not padding_size_4 is None), "padding_size_3 padding_size_4 必须都不是none"
+        assert (not padding_size_3 is None) and (
+            not padding_size_4 is None), "padding_size_3 padding_size_4 必须都不是none"
         assert padding_size_1 >= 0 and padding_size_2 >= 0 and padding_size_3 >= 0 and padding_size_4 >= 0
-        
-        padding_array = np.zeros([rows +  padding_size_1 + padding_size_2, cols +  padding_size_3 +  padding_size_4, ndim], dtype = type(in_array[0][0][0]))
-        padding_array[padding_size_1:rows + padding_size_1, padding_size_3:cols + padding_size_3, :] = in_array
-        
-    return padding_array 
+
+        padding_array = np.zeros([rows + padding_size_1 + padding_size_2, cols +
+                                  padding_size_3 + padding_size_4, ndim], dtype=type(in_array[0][0][0]))
+        padding_array[padding_size_1:rows + padding_size_1,
+                      padding_size_3:cols + padding_size_3, :] = in_array
+
+    return padding_array
 
 
 class MyEncoder(json.JSONEncoder):
@@ -84,6 +91,7 @@ class MyEncoder(json.JSONEncoder):
     在json.dump时加入到cls中即可，例如：
     json.dumps(data, cls=MyEncoder) 
     """
+
     def default(self, obj):
         if isinstance(obj, np.integer):
             return int(obj)
@@ -96,21 +104,22 @@ class MyEncoder(json.JSONEncoder):
         else:
             return super(MyEncoder, self).default(obj)
 
+
 class Sys_Logger(object):
-    
+
     def __init__(self, fileN="Default.log"):
-        
+
         self.terminal = sys.stdout
         if OS_exists(fileN):
             self.log = open(fileN, "a")
         else:
             self.log = open(fileN, "w")
- 
+
     def write(self, message):
-        
+
         self.terminal.write(message)
         self.log.write(message)
- 
+
     def flush(self):
         self.terminal.flush()
 
@@ -120,9 +129,10 @@ class Loger_printer():
     日志打印类
     会在控制台与日志同时打印信息    
     """
-    def __init__(self,logger):
+
+    def __init__(self, logger):
         self.logger = logger
-        
+
     def vvd_logging(self, message):
         self.logger.info(message)
         print(message)
@@ -132,46 +142,46 @@ def log_init(log_path):
     """
     initialize logging 
     save the logging object in `config.Parameters.Logging_Object`
-    
+
     after this operation,
     we could save logs with simple orders such as `logging.debug('test debug')` `logging.info('test info')` 
     logging level : debug < info < warning <error < critical
-    
+
     Loger_printer.vvd_logging('test')
     """
     dir_name = os.path.dirname(log_path)
-    
+
     dir_check(dir_name)
-    
+
     log_file_path = log_path
-    
+
     if os.path.exists(log_file_path):
         # open log file as  mode of append
         open_type = 'a'
     else:
         # open log file as  mode of write
         open_type = 'w'
-        
+
     logging.basicConfig(
-    
+
         # 日志级别,logging.DEBUG,logging.ERROR
-        level = logging.INFO,  
+        level=logging.INFO,
 
         # 日志格式: 时间、   日志信息
-        format = '%(asctime)s: %(message)s',
-    
+        format='%(asctime)s: %(message)s',
+
         # 打印日志的时间
-        datefmt = '%Y-%m-%d %H:%M:%S',
-    
+        datefmt='%Y-%m-%d %H:%M:%S',
+
         # 日志文件存放的目录（目录必须存在）及日志文件名
-        filename = log_file_path, 
-    
+        filename=log_file_path,
+
         # 打开日志文件的方式
-        filemode = open_type
-    )    
-    
+        filemode=open_type
+    )
+
     logging.StreamHandler()
-    
+
     return Loger_printer(logging)
 
 
@@ -181,7 +191,7 @@ def dir_exists(dir_path):
     """
     if not os.path.isdir(dir_path):
         raise TypeError("dir not found")
-    
+
 
 def dir_check(dir_path):
     """
@@ -190,7 +200,7 @@ def dir_check(dir_path):
     """
     if not os.path.isdir(dir_path):
         try:
-            os.makedirs(dir_path) 
+            os.makedirs(dir_path)
         except Exception as err:
             print(f'failed to make dir {dir_path}, error {err}')
         return False
@@ -198,20 +208,20 @@ def dir_check(dir_path):
         return True
 
 
-def cv_image_show(image,window_name='image show'):
+def cv_image_show(image, window_name='image show'):
     '''
     show image (for debug)
     press anykey to destory the window 
-    
+
     image: image in numpy 
     window_name: name of the window
-    
+
     image color - bgr
-    '''    
+    '''
     cv.namedWindow(window_name, cv.WINDOW_NORMAL)
-    cv.imshow(window_name,image)
+    cv.imshow(window_name, image)
     cv.waitKey(0)
-    cv.destroyAllWindows()    
+    cv.destroyAllWindows()
 
 
 def extend_image_channel(image):
@@ -219,51 +229,54 @@ def extend_image_channel(image):
     cv显示三通道图像，本函数将原始图像扩展到三通道
     '''
     shape = image.shape
-    
+
     if len(shape) == 3:
         if shape[2] == 3:
             return image
-        elif shape[2] ==1:
-            temp_image = np.zeros([shape[0],shape[1],3])
+        elif shape[2] == 1:
+            temp_image = np.zeros([shape[0], shape[1], 3])
             for i in range(3):
-                temp_image[:,:,i] = image[:,:,0]
+                temp_image[:, :, i] = image[:, :, 0]
             return temp_image
         else:
             raise TypeError('image type error')
     elif len(shape) == 2:
-        temp_image = np.zeros([shape[0],shape[1],3])
+        temp_image = np.zeros([shape[0], shape[1], 3])
         for i in range(3):
-            temp_image[:,:,i] = image
+            temp_image[:, :, i] = image
         return temp_image
     else:
         raise TypeError('image type error')
-    
-    
-def image_show(image,window_name='image show'):
+
+
+def image_show(image, window_name='image show'):
     '''
     更加鲁棒地显示图像包括二维图像,第三维度为1的图像
     '''
     temp_image = extend_image_channel(image)
     cv_image_show(image=temp_image, window_name=window_name)
- 
-            
+
+
 def data_show(data):
     '''
     show data in a chart
     '''
     fig = plt.figure()
-    ax = fig.add_subplot(1,1,1)
+    ax = fig.add_subplot(1, 1, 1)
     ax.plot(data)
-    fig.show()    
-    
+    fig.show()
+
 
 def cv_rgb_imread(image_path):
     """
     按照RGB顺序使用cv读取图像
     """
     image = cv.imread(image_path)
-    b,g,r = cv.split(image)
-    image = cv.merge([r,g,b])
-    
+    b, g, r = cv.split(image)
+    image = cv.merge([r, g, b])
+
     return image
 
+
+def time_stamp():
+    return time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
