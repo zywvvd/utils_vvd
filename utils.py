@@ -18,6 +18,7 @@ import math
 import logging
 import os
 import platform
+import hashlib
 
 from ipdb import set_trace
 
@@ -31,9 +32,22 @@ def strong_printing(string):
     print('######################################################')
 
 
+def current_system():
+    return platform.system()
+
+
+def get_hash_code(file):
+    assert os.path.exists(file)
+    md5_hash = hashlib.md5()
+    with open(file, "rb") as fid:
+        md5_hash.update(fid.read())
+        digest = md5_hash.hexdigest()
+    return digest
+
+
 def my_linux_set_trace(debug=False):
     if debug:
-        Current_System = platform.system()
+        Current_System = current_system()
         if Current_System == 'Linux':
             set_trace()
 
