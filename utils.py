@@ -65,8 +65,8 @@ def zero_padding(in_array, padding_size_1, padding_size_2, padding_size_3=None, 
 
     (padding_size_3-4 均不为 None 时)
     :padding_size_1:  上补零行数
-    :padding_size_2:  下补零列数
-    :padding_size_3:  左补零行数
+    :padding_size_2:  下补零行数
+    :padding_size_3:  左补零列数
     :padding_size_4:  右补零列数
 
     输出：
