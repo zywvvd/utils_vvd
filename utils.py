@@ -119,25 +119,6 @@ class MyEncoder(json.JSONEncoder):
             return super(MyEncoder, self).default(obj)
 
 
-class Sys_Logger(object):
-
-    def __init__(self, fileN="Default.log"):
-
-        self.terminal = sys.stdout
-        if OS_exists(fileN):
-            self.log = open(fileN, "a")
-        else:
-            self.log = open(fileN, "w")
-
-    def write(self, message):
-
-        self.terminal.write(message)
-        self.log.write(message)
-
-    def flush(self):
-        self.terminal.flush()
-
-
 class Loger_printer():
     """
     日志打印类
