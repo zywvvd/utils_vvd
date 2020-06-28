@@ -240,11 +240,15 @@ def cv_image_show(image, window_name='image show'):
     cv.destroyAllWindows()
 
 
-def extend_image_channel(image):
+def extend_image_channel(input_image):
     '''
     cv显示三通道图像，本函数将原始图像扩展到三通道
     '''
+    image = input_image.copy()
+
     shape = image.shape
+    if 0 < np.max(image) <= 1:
+        image = (255*image).astype('uint8')
 
     if len(shape) == 3:
         if shape[2] == 3:
