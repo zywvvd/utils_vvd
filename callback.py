@@ -17,14 +17,13 @@ class ModelCheckpointAfter(ModelCheckpoint):
     每个epoch结束保存模型
     """
 
-    def __init__(self, epoch, steps, filepath, monitor='acc', verbose=0,
+    def __init__(self, epoch, filepath, monitor='acc', verbose=0,
                  save_best_only=False, save_weights_only=False,
                  mode='auto', period=1):
 
         super().__init__(filepath, monitor, verbose,
                          save_best_only, save_weights_only, mode, period)
         self.after_epoch = epoch
-        self.steps = steps
         self.index = 1
 
     def on_epoch_end(self, epoch, logs=None):
@@ -47,11 +46,14 @@ def my_ReduceLROnPlateau(decay_factor, patience, min_lr):
 
 
 class ParallelModelCheckpoint(ModelCheckpointAfter):
-    def __init__(self, model, epoch, steps, filepath, monitor='val_loss', verbose=0,
-                 save_best_only=False, save_weights_only=False,
-                 mode='auto', period=1):
+    '''
+    多gpu checkpoint
+    '''
+
+    def __init__(self, model, epoch, filepath, monitor='val_loss', verbose=0,
+                 save_best_only=False, save_weights_only=False, mode='auto', period=1):
         self.single_model = model
-        super(ParallelModelCheckpoint, self).__init__(epoch, steps, filepath,
+        super(ParallelModelCheckpoint, self).__init__(epoch, filepath,
                                                       monitor, verbose, save_best_only, save_weights_only, mode, period)
 
     def set_model(self, model):
@@ -112,15 +114,15 @@ def learning_rate_step_decay(step_size, decay, verbose=1):
 
 
 def learning_rate_cosine_decay_with_warmup_and_cycle(
-        learning_rate_base = 0.00004,
-        cosine_total_step = 10,
-        warmup_learning_rate = 4e-6,
-        warmup_steps = 3,
-        least_learnning_rate = 3e-7,
-        cycle = True,
-        t_mul = 1.7,
-        m_mul = 0.6,
-        verbose = 1):
+        learning_rate_base=0.00004,
+        cosine_total_step=10,
+        warmup_learning_rate=4e-6,
+        warmup_steps=3,
+        least_learnning_rate=3e-7,
+        cycle=True,
+        t_mul=1.7,
+        m_mul=0.6,
+        verbose=1):
     """
     每批次带有warmup余弦退火学习率计算
     :param global_step: 当前到达的步数
@@ -192,7 +194,7 @@ def learning_rate_cosine_decay_with_warmup_and_cycle(
 
     assert learning_rate_base > warmup_learning_rate, "lr after warming-up must be larger"
 
-    #show_lr_curve()
+    # show_lr_curve()
 
     return LearningRateScheduler(cosine_decay_with_warmup_schedule, verbose=verbose)
 
