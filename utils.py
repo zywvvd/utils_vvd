@@ -300,3 +300,8 @@ def cv_rgb_imread(image_path):
 
 def time_stamp():
     return time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
+
+
+def vvd_image_preprocess(image):
+    new_image = image / 127.5 - 1
+    return new_image
