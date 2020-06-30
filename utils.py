@@ -27,7 +27,7 @@ def strong_printing(string):
 
     print('######################################################')
     print()
-    print(string)
+    print(string.upper())
     print()
     print('######################################################')
 
