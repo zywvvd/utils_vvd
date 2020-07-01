@@ -25,12 +25,11 @@ from ipdb import set_trace
 
 def strong_printing(string):
 
-    print('######################################################')
     print()
+    print('######################################################')
     print(string.upper())
-    print()
     print('######################################################')
-
+    print()
 
 def current_system():
     return platform.system()
