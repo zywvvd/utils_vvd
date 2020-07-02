@@ -7,6 +7,7 @@ from os.path import basename as OS_basename
 from os.path import join as OS_join
 from os.path import exists as OS_exists
 from os.path import isdir as OS_isdir
+from os.path import dirname as OS_dirname
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -18,22 +19,48 @@ import math
 import logging
 import os
 import platform
+import hashlib
 
 from ipdb import set_trace
 
 
 def strong_printing(string):
 
-    print('######################################################')
-    print()
-    print(string)
     print()
     print('######################################################')
+    print(string.upper())
+    print('######################################################')
+    print()
+
+def current_system():
+    return platform.system()
+
+
+def encode_chinese_to_unicode(input_string):
+    '''
+    将中文转换为 unicode #Uxxxx 形式
+    '''
+    unicode_string = ''
+    for char in input_string:
+        if ord(char) > 255:
+            char = "%%U%04x" % ord(char)
+        unicode_string += char
+    unicode_string = unicode_string.replace('%', '#')
+    return unicode_string
+
+
+def get_hash_code(file):
+    assert os.path.exists(file)
+    md5_hash = hashlib.md5()
+    with open(file, "rb") as fid:
+        md5_hash.update(fid.read())
+        digest = md5_hash.hexdigest()
+    return digest
 
 
 def my_linux_set_trace(debug=False):
     if debug:
-        Current_System = platform.system()
+        Current_System = current_system()
         if Current_System == 'Linux':
             set_trace()
 
@@ -51,12 +78,12 @@ def zero_padding(in_array, padding_size_1, padding_size_2, padding_size_3=None, 
 
     (padding_size_3-4 均不为 None 时)
     :padding_size_1:  上补零行数
-    :padding_size_2:  下补零列数
-    :padding_size_3:  左补零行数
+    :padding_size_2:  下补零行数
+    :padding_size_3:  左补零列数
     :padding_size_4:  右补零列数
 
     输出：
-    :padding_array: 补零后的图像（新建矩阵，不修改原始输入）
+    :padded_array: 补零后的图像（新建矩阵，不修改原始输入）
     """
 
     assert np.ndim(in_array) == 3
@@ -66,22 +93,22 @@ def zero_padding(in_array, padding_size_1, padding_size_2, padding_size_3=None, 
     if (padding_size_3 is None) and (padding_size_4 is None):
         assert padding_size_1 >= 0 and padding_size_2 >= 0
 
-        padding_array = np.zeros(
+        padded_array = np.zeros(
             [rows + 2 * padding_size_1, cols + 2 * padding_size_2, ndim], dtype=type(in_array[0][0][0]))
-        padding_array[padding_size_1:rows + padding_size_1,
-                      padding_size_2:cols + padding_size_2, :] = in_array
+        padded_array[padding_size_1:rows + padding_size_1,
+                     padding_size_2:cols + padding_size_2, :] = in_array
 
     else:
         assert (not padding_size_3 is None) and (
             not padding_size_4 is None), "padding_size_3 padding_size_4 必须都不是none"
         assert padding_size_1 >= 0 and padding_size_2 >= 0 and padding_size_3 >= 0 and padding_size_4 >= 0
 
-        padding_array = np.zeros([rows + padding_size_1 + padding_size_2, cols +
-                                  padding_size_3 + padding_size_4, ndim], dtype=type(in_array[0][0][0]))
-        padding_array[padding_size_1:rows + padding_size_1,
-                      padding_size_3:cols + padding_size_3, :] = in_array
+        padded_array = np.zeros([rows + padding_size_1 + padding_size_2, cols +
+                                 padding_size_3 + padding_size_4, ndim], dtype=type(in_array[0][0][0]))
+        padded_array[padding_size_1:rows + padding_size_1,
+                     padding_size_3:cols + padding_size_3, :] = in_array
 
-    return padding_array
+    return padded_array
 
 
 class MyEncoder(json.JSONEncoder):
@@ -106,6 +133,9 @@ class MyEncoder(json.JSONEncoder):
 
 
 class Sys_Logger(object):
+    '''
+    修改系统输出流
+    '''
 
     def __init__(self, fileN="Default.log"):
 
@@ -224,11 +254,15 @@ def cv_image_show(image, window_name='image show'):
     cv.destroyAllWindows()
 
 
-def extend_image_channel(image):
+def extend_image_channel(input_image):
     '''
     cv显示三通道图像，本函数将原始图像扩展到三通道
     '''
+    image = input_image.copy()
+
     shape = image.shape
+    if 0 < np.max(image) <= 1:
+        image = (255*image).astype('uint8')
 
     if len(shape) == 3:
         if shape[2] == 3:
@@ -280,3 +314,8 @@ def cv_rgb_imread(image_path):
 
 def time_stamp():
     return time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
+
+
+def vvd_image_preprocess(image):
+    new_image = image / 127.5 - 1
+    return new_image
