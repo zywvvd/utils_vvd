@@ -69,9 +69,9 @@ def model_checkpoint_after(epoch, steps, path, monitor, save_best_only, Parallel
     pattern = os.path.join(path, 'epoch-{epoch:03d}-{' + monitor + ':.4f}.h5')
 
     if ParallelModel:
-        return ParallelModelCheckpoint(ParallelModel, epoch, steps, filepath=pattern, monitor=monitor, save_best_only=save_best_only)
+        return ParallelModelCheckpoint(ParallelModel, epoch, filepath=pattern, monitor=monitor, save_best_only=save_best_only)
     else:
-        return ModelCheckpointAfter(epoch, steps, filepath=pattern, monitor=monitor,
+        return ModelCheckpointAfter(epoch, filepath=pattern, monitor=monitor,
                                     save_best_only=save_best_only, mode='auto')
 
 
