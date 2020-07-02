@@ -60,7 +60,7 @@ class ParallelModelCheckpoint(ModelCheckpointAfter):
         super(ParallelModelCheckpoint, self).set_model(self.single_model)
 
 
-def model_checkpoint_after(epoch, steps, path, monitor, save_best_only, ParallelModel):
+def model_checkpoint_after(epoch, path, monitor, save_best_only, ParallelModel):
     """
     每个epoch结束保存模型
     """
@@ -75,7 +75,7 @@ def model_checkpoint_after(epoch, steps, path, monitor, save_best_only, Parallel
                                     save_best_only=save_best_only, mode='auto')
 
 
-class Data_Shuffle(Callback):
+class data_shuffle(Callback):
     """
     每个epoch结束随机化训练数据
     """
