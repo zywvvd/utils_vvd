@@ -7,6 +7,7 @@ from os.path import basename as OS_basename
 from os.path import join as OS_join
 from os.path import exists as OS_exists
 from os.path import isdir as OS_isdir
+from os.path import dirname as OS_dirname
 
 import matplotlib.pyplot as plt
 import numpy as np
