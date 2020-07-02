@@ -160,7 +160,7 @@ def learning_rate_cosine_decay_with_warmup_and_cycle(
             learning_rate = warmup_learning_rate + \
                 ((learning_rate_base - warmup_learning_rate) / warmup_steps) * epoch
         else:
-            cosine_step = epoch - warmup_steps - 1
+            cosine_step = max(epoch - warmup_steps - 1,0)
             if not cycle:
 
                 if cosine_step < cosine_total_step:
