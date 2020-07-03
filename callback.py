@@ -60,19 +60,20 @@ class ParallelModelCheckpoint(ModelCheckpointAfter):
         super(ParallelModelCheckpoint, self).set_model(self.single_model)
 
 
-def model_checkpoint_after(epoch, path, monitor, save_best_only, ParallelModel):
+def model_checkpoint_after(epoch, path, monitor, verbose=1, save_best_only=True, ParallelModel=None, save_weights_only=False, mode='auto'):
     """
     每个epoch结束保存模型
     """
     if not (os.path.exists(path)):
-        os.mkdir(path)
+        os.makedirs(path)
     pattern = os.path.join(path, 'epoch-{epoch:03d}-{' + monitor + ':.4f}.h5')
 
     if ParallelModel:
-        return ParallelModelCheckpoint(ParallelModel, epoch, filepath=pattern, monitor=monitor, save_best_only=save_best_only)
+        return ParallelModelCheckpoint(ParallelModel, epoch, filepath=pattern, monitor=monitor, verbose=verbose, save_best_only=save_best_only,
+                                       save_weights_only=save_weights_only, mode=mode)
     else:
-        return ModelCheckpointAfter(epoch, filepath=pattern, monitor=monitor,
-                                    save_best_only=save_best_only, mode='auto')
+        return ModelCheckpointAfter(epoch, filepath=pattern, monitor=monitor, verbose=verbose,
+                                    save_best_only=save_best_only, save_weights_only=save_weights_only, mode=mode)
 
 
 class data_shuffle(Callback):
@@ -162,7 +163,7 @@ def learning_rate_cosine_decay_with_warmup_and_cycle(
             learning_rate = warmup_learning_rate + \
                 ((learning_rate_base - warmup_learning_rate) / warmup_steps) * epoch
         else:
-            cosine_step = max(epoch - warmup_steps - 1,0)
+            cosine_step = max(epoch - warmup_steps - 1, 0)
             if not cycle:
 
                 if cosine_step < cosine_total_step:
