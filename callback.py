@@ -60,7 +60,7 @@ class ParallelModelCheckpoint(ModelCheckpointAfter):
         super(ParallelModelCheckpoint, self).set_model(self.single_model)
 
 
-def model_checkpoint_after(epoch, path, monitor, verbose=1, save_best_only=True, ParallelModel=None, save_weights_only=False, mode='auto'):
+def model_checkpoint_after(epoch, path, monitor, verbose=1, save_best_only=False, ParallelModel=None, save_weights_only=False, mode='auto'):
     """
     每个epoch结束保存模型
     """
@@ -72,7 +72,7 @@ def model_checkpoint_after(epoch, path, monitor, verbose=1, save_best_only=True,
         return ParallelModelCheckpoint(ParallelModel, epoch, filepath=pattern, monitor=monitor, verbose=verbose, save_best_only=save_best_only,
                                        save_weights_only=save_weights_only, mode=mode)
     else:
-        return ModelCheckpointAfter(epoch, filepath=pattern, monitor=monitor, verbose=verbose,
+        return ModelCheckpointAfter(epoch, filepath=pattern, monitor=monitor,       verbose=verbose,
                                     save_best_only=save_best_only, save_weights_only=save_weights_only, mode=mode)
 
 
