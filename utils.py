@@ -49,7 +49,7 @@ def encode_chinese_to_unicode(input_string):
     return unicode_string
 
 
-def get_hash_code(file):
+def get_file_hash_code(file):
     assert os.path.exists(file)
     md5_hash = hashlib.md5()
     with open(file, "rb") as fid:
