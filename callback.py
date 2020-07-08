@@ -24,17 +24,13 @@ class ModelCheckpointAfter(ModelCheckpoint):
         super().__init__(filepath, monitor, verbose,
                          save_best_only, save_weights_only, mode, period)
         self.after_epoch = epoch
-        self.index = 1
+        self.index = -1
 
     def on_epoch_end(self, epoch, logs=None):
         if epoch + 1 > self.after_epoch:
             super().on_epoch_end(self.index, logs)
             self.index += 1
 
-    def on_batch_end(self, batch, logs=None):
-        # print(f'batch: {batch}')
-        # print(f'logs : {logs}')
-        pass
 
 
 def my_ReduceLROnPlateau(decay_factor, patience, min_lr):
