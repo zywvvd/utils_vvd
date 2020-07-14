@@ -21,3 +21,4 @@ from .utils import time_stamp
 from .utils import vvd_image_preprocess
 from .utils import get_main_file_name
 from .utils import underline_connection
+from .utils import current_split_char

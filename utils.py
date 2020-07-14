@@ -35,6 +35,7 @@ def underline_connection(str_list):
     string = string[:-1]
     return string
 
+
 def get_main_file_name(string):
     """
     return file name without extension
@@ -51,8 +52,21 @@ def strong_printing(string):
     print('######################################################')
     print()
 
+
 def current_system():
     return platform.system()
+
+
+def current_split_char():
+    """
+    返回当前操作系统的路径分隔符
+    """
+    if current_system() == 'Windows':
+        return '\\'
+    elif current_system() == 'Linux':
+        return '/'
+    else:
+        return '/'
 
 
 def encode_chinese_to_unicode(input_string):
@@ -242,11 +256,21 @@ def dir_exists(dir_path):
         raise TypeError("dir not found")
 
 
+def uniform_split_char(string, split_char=current_split_char()):
+    """
+    uniform the split char of a string
+    """
+    assert isinstance(string, str)
+    return string.replace('\\', split_char).replace('/', split_char)
+
+
 def dir_check(dir_path):
     """
     check if `dir_path` is a real directory path
     if dir not found, make one
     """
+    assert isinstance(dir_path, str)
+    dir_path = uniform_split_char(dir_path)
     if not os.path.isdir(dir_path):
         try:
             os.makedirs(dir_path)
