@@ -31,7 +31,7 @@ def underline_connection(str_list):
     assert isinstance(str_list, list)
     string = ""
     for item in str_list:
-        string = item + '_' + string
+        string = string + item + '_'
     string = string[:-1]
     return string
 
