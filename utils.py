@@ -45,11 +45,16 @@ def get_main_file_name(string):
 
 
 def strong_printing(string):
-
+    """
+    print string strongly
+    """
     print()
-    print('######################################################')
-    print(string.upper())
-    print('######################################################')
+    boudary_size = max(40, len(string)*2)
+    split_string = boudary_size*'#'
+    print(split_string)
+    space_size = (boudary_size - len(string))//2
+    print(space_size*' '+string.upper())
+    print(split_string)
     print()
 
 
@@ -366,4 +371,5 @@ def vvd_image_preprocess(image):
 
 if __name__ == '__main__':
     test_name = 'abc/sadf/gsdf.sadf.test'
-    underline_connection(['1','f','5'])
+    strong_printing(test_name)
+
