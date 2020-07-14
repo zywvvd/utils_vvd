@@ -19,3 +19,5 @@ from .utils import dir_check
 from .utils import extend_image_channel
 from .utils import time_stamp
 from .utils import vvd_image_preprocess
+from .utils import get_main_file_name
+from .utils import underline_connection

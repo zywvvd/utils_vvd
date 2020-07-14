@@ -24,6 +24,25 @@ import hashlib
 from ipdb import set_trace
 
 
+def underline_connection(str_list):
+    """
+    connect strings in the list with underline
+    """
+    assert isinstance(str_list, list)
+    string = ""
+    for item in str_list:
+        string = item + '_' + string
+    string = string[:-1]
+    return string
+
+def get_main_file_name(string):
+    """
+    return file name without extension
+    """
+    assert isinstance(string, str)
+    return os.path.splitext(os.path.basename(string))[0]
+
+
 def strong_printing(string):
 
     print()
@@ -319,3 +338,8 @@ def time_stamp():
 def vvd_image_preprocess(image):
     new_image = image / 127.5 - 1
     return new_image
+
+
+if __name__ == '__main__':
+    test_name = 'abc/sadf/gsdf.sadf.test'
+    underline_connection(['1','f','5'])
