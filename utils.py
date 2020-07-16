@@ -49,7 +49,7 @@ def strong_printing(string):
     print string strongly
     """
     print()
-    boudary_size = max(40, len(string)*1.4)
+    boudary_size = int(max(40, len(string)*1.4))
     split_string = boudary_size*'#'
     print(split_string)
     space_size = (boudary_size - len(string))//2
