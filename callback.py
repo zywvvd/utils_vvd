@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+# @Author: Zhang Yiwei
+# @Date:   2020-07-18 02:38:46
+# @Last Modified by:   Zhang Yiwei
+# @Last Modified time: 2020-07-18 02:42:02
 #
 # image calssification 网络回调函数
 #
@@ -10,7 +15,7 @@ from keras.callbacks import TensorBoard
 from keras.callbacks import ModelCheckpoint
 from keras.callbacks import Callback
 from keras.callbacks import ReduceLROnPlateau
-
+from .utils import underline_connection
 
 class ModelCheckpointAfter(ModelCheckpoint):
     """
@@ -32,7 +37,6 @@ class ModelCheckpointAfter(ModelCheckpoint):
             self.index += 1
 
 
-
 def my_ReduceLROnPlateau(decay_factor, patience, min_lr):
 
     lr_reducer = ReduceLROnPlateau(
@@ -45,7 +49,6 @@ class ParallelModelCheckpoint(ModelCheckpointAfter):
     '''
     多gpu checkpoint
     '''
-
     def __init__(self, model, epoch, filepath, monitor='val_loss', verbose=0,
                  save_best_only=False, save_weights_only=False, mode='auto', period=1):
         self.single_model = model
@@ -56,13 +59,13 @@ class ParallelModelCheckpoint(ModelCheckpointAfter):
         super(ParallelModelCheckpoint, self).set_model(self.single_model)
 
 
-def model_checkpoint_after(epoch, path, monitor, verbose=1, save_best_only=False, ParallelModel=None, save_weights_only=False, mode='auto'):
+def model_checkpoint_after(epoch, path, monitor, verbose=1, save_best_only=False, ParallelModel=None, save_weights_only=False, mode='auto', info_added=''):
     """
     每个epoch结束保存模型
     """
     if not (os.path.exists(path)):
         os.makedirs(path)
-    pattern = os.path.join(path, 'epoch-{epoch:03d}-{' + monitor + ':.4f}.h5')
+    pattern = os.path.join(path, underline_connection(info_added, 'epoch-{epoch:03d}-{' + monitor + ':.4f}.h5'))
 
     if ParallelModel:
         return ParallelModelCheckpoint(ParallelModel, epoch, filepath=pattern, monitor=monitor, verbose=verbose, save_best_only=save_best_only,

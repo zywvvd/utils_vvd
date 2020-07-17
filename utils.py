@@ -1,3 +1,8 @@
+# -*- coding: utf-8 -*-
+# @Author: Zhang Yiwei
+# @Date:   2020-07-18 02:40:35
+# @Last Modified by:   Zhang Yiwei
+# @Last Modified time: 2020-07-18 02:40:44
 #
 # vvd Tool functions
 #
@@ -15,7 +20,6 @@ import json
 import time
 import sys
 import cv2 as cv
-import math
 import logging
 import os
 import platform
@@ -31,7 +35,8 @@ def underline_connection(*str_args):
     assert isinstance(str_args, tuple)
     string = ""
     for item in str_args:
-        string = string + item + '_'
+        if item != '':
+            string = string + item + '_'
     string = string[:-1]
     return string
 
