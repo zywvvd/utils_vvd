@@ -24,13 +24,13 @@ import hashlib
 from ipdb import set_trace
 
 
-def underline_connection(str_list):
+def underline_connection(*str_args):
     """
     connect strings in the list with underline
     """
-    assert isinstance(str_list, list)
+    assert isinstance(str_args, tuple)
     string = ""
-    for item in str_list:
+    for item in str_args:
         string = string + item + '_'
     string = string[:-1]
     return string
@@ -372,4 +372,5 @@ def vvd_image_preprocess(image):
 if __name__ == '__main__':
     test_name = 'abc/sadf/gsdf.sadf.test'
     strong_printing(test_name)
+    print(underline_connection())
 
