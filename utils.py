@@ -2,7 +2,7 @@
 # @Author: Zhang Yiwei
 # @Date:   2020-07-18 02:40:35
 # @Last Modified by:   Zhang Yiwei
-# @Last Modified time: 2020-07-18 02:40:44
+# @Last Modified time: 2020-07-18 03:40:08
 #
 # vvd Tool functions
 #
@@ -77,6 +77,26 @@ def current_split_char():
         return '/'
     else:
         return '/'
+
+
+def save_file_path_check(save_file_path):
+    """
+    检查要保存的文件路径
+    - 如果文件已经存在 ： 在文件名与扩展名之间加入当前时间作为后缀 避免覆盖之前的文件并给出提示
+    - 如文件不存在 ： 检查文件所在的文件夹目录
+    返回检查后的文件路径
+    """
+    assert isinstance(save_file_path, str)
+    if OS_exists(save_file_path):
+        main_file_name = get_main_file_name(save_file_path)
+        new_base_name = OS_basename(save_file_path).replace(main_file_name, underline_connection(main_file_name, time_stamp()))
+        checked_save_file_path = OS_join(OS_dirname(save_file_path), new_base_name)
+        print("file path {} already exists, the file will be saved as {} instead.".format(save_file_path, checked_save_file_path))
+    else:
+        dir_check(OS_dirname(save_file_path))
+        assert OS_basename(save_file_path) != ''
+        checked_save_file_path = save_file_path
+    return checked_save_file_path
 
 
 def encode_chinese_to_unicode(input_string):
