@@ -2,7 +2,7 @@
 # @Author: Zhang Yiwei
 # @Date:   2020-07-18 02:40:35
 # @Last Modified by:   Zhang Yiwei
-# @Last Modified time: 2020-07-18 03:40:08
+# @Last Modified time: 2020-07-23 10:32:59
 #
 # vvd Tool functions
 #
@@ -394,8 +394,22 @@ def vvd_image_preprocess(image):
     return new_image
 
 
+def json_load(json_path):
+    try:
+        assert OS_exists(json_path)
+    except:
+        print('file not found !')
+    with open(json_path, 'r') as fp:
+        return json.load(fp)
+
+
+def json_save(json_dict, json_path):
+    json_path = save_file_path_check(json_path)
+    with open(json_path, 'w', encoding='utf-8') as fp:
+        json.dump(json_dict, fp, indent=4, cls=MyEncoder)
+
+
 if __name__ == '__main__':
     test_name = 'abc/sadf/gsdf.sadf.test'
     strong_printing(test_name)
     print(underline_connection())
-
