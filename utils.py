@@ -2,7 +2,7 @@
 # @Author: Zhang Yiwei
 # @Date:   2020-07-18 02:40:35
 # @Last Modified by:   Zhang Yiwei
-# @Last Modified time: 2020-07-23 10:32:59
+# @Last Modified time: 2020-07-24 12:54:43
 #
 # vvd Tool functions
 #
@@ -28,15 +28,30 @@ import hashlib
 from ipdb import set_trace
 
 
-def underline_connection(*str_args):
+def find_sub_string(string, substring, times):
+    """
+    find the char position of the substring in string for times-th comes up
+    """
+    current = 0
+    for _ in range(1, times+1):
+        current = string.find(substring, current+1)
+        if current == -1:
+            return -1
+
+    return current
+
+
+def underline_connection(*str_args, connect_char='_'):
     """
     connect strings in the list with underline
     """
     assert isinstance(str_args, tuple)
     string = ""
     for item in str_args:
+        if isinstance(item, list):
+            item = underline_connection(*item)
         if item != '':
-            string = string + item + '_'
+            string = string + item + connect_char
     string = string[:-1]
     return string
 
