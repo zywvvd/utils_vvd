@@ -49,7 +49,7 @@ def underline_connection(*str_args, connect_char='_'):
     string = ""
     for item in str_args:
         if isinstance(item, list):
-            item = underline_connection(*item)
+            item = underline_connection(*item, connect_char=connect_char)
         if item != '':
             string = string + item + connect_char
     string = string[:-1]
