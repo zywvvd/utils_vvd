@@ -14,6 +14,8 @@ from os.path import exists as OS_exists
 from os.path import isdir as OS_isdir
 from os.path import dirname as OS_dirname
 
+from glob import glob
+
 import matplotlib.pyplot as plt
 import numpy as np
 import json
@@ -422,6 +424,10 @@ def json_save(json_dict, json_path):
     json_path = save_file_path_check(json_path)
     with open(json_path, 'w', encoding='utf-8') as fp:
         json.dump(json_dict, fp, indent=4, cls=MyEncoder)
+
+
+def glob_recursively(path, extension):
+    return glob(OS_join(path, '**', '*.' + extension), recursive=True)
 
 
 if __name__ == '__main__':
