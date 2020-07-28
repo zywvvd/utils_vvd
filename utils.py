@@ -26,8 +26,19 @@ import logging
 import os
 import platform
 import hashlib
+import pickle
 
 from ipdb import set_trace
+
+
+def pickle_save(object, save_path):
+    with open(save_path, 'wb') as fp:
+        pickle.dump(object, fp)
+
+
+def pickle_load(load_path):
+    with open(load_path, 'rb') as fp:
+        return pickle.load(fp)
 
 
 def find_sub_string(string, substring, times):
