@@ -2,7 +2,7 @@
 # @Author: Zhang Yiwei
 # @Date:   2020-07-18 02:38:46
 # @Last Modified by:   Zhang Yiwei
-# @Last Modified time: 2020-07-18 02:42:02
+# @Last Modified time: 2020-07-29 12:25:04
 #
 # image calssification 网络回调函数
 #
@@ -99,7 +99,7 @@ class data_shuffle(Callback):
         pass
 
 
-def learning_rate_step_decay(step_size, decay, verbose=1):
+def learning_rate_step_decay(step_size, decay, verbose=1, least_lr=1e-16):
     """
     学习率衰减，setp 衰减
     """
@@ -108,7 +108,7 @@ def learning_rate_step_decay(step_size, decay, verbose=1):
             return lr * decay
         else:
             return lr
-        return lr
+        return max(lr, least_lr)
 
     return LearningRateScheduler(schedule, verbose=verbose)
 
