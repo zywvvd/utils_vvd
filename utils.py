@@ -2,7 +2,7 @@
 # @Author: Zhang Yiwei
 # @Date:   2020-07-18 02:40:35
 # @Last Modified by:   Zhang Yiwei
-# @Last Modified time: 2020-07-30 14:36:47
+# @Last Modified time: 2020-07-30 15:02:44
 #
 # vvd Tool functions
 #
@@ -380,7 +380,7 @@ def extend_image_channel(input_image):
         else:
             raise TypeError('image type error')
     elif len(shape) == 2:
-        temp_image = np.zeros([shape[0], shape[1], 3])
+        temp_image = np.zeros([shape[0], shape[1], 3], dtype=type(image[0][0]))
         for i in range(3):
             temp_image[:, :, i] = image
         return temp_image
