@@ -2,7 +2,7 @@
 # @Author: Zhang Yiwei
 # @Date:   2020-07-18 02:40:35
 # @Last Modified by:   Zhang Yiwei
-# @Last Modified time: 2020-07-24 12:54:43
+# @Last Modified time: 2020-07-30 14:36:47
 #
 # vvd Tool functions
 #
@@ -29,6 +29,10 @@ import hashlib
 import pickle
 
 from ipdb import set_trace
+
+
+def get_current_dir():
+    return os.path.dirname(os.path.realpath(__file__))
 
 
 def pickle_save(object, save_path):
@@ -149,7 +153,7 @@ def get_file_hash_code(file):
     return digest
 
 
-def my_linux_set_trace(debug=False):
+def my_linux_set_trace(debug=True):
     if debug:
         Current_System = current_system()
         if Current_System == 'Linux':
