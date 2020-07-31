@@ -36,6 +36,7 @@ def get_current_dir():
 
 
 def pickle_save(object, save_path):
+    save_path = save_file_path_check(save_path)
     with open(save_path, 'wb') as fp:
         pickle.dump(object, fp)
 
