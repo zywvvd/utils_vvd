@@ -2,7 +2,7 @@
 # @Author: Zhang Yiwei
 # @Date:   2020-07-18 03:40:39
 # @Last Modified by:   Zhang Yiwei
-# @Last Modified time: 2020-07-24 12:55:00
+# @Last Modified time: 2020-08-03 18:45:15
 from .utils import image_show
 from .utils import cv_rgb_imread
 from .utils import OS_basename
@@ -34,3 +34,5 @@ from .utils import find_sub_string
 from .utils import glob_recursively
 from .utils import pickle_save
 from .utils import pickle_load
+from .utils import whether_divisible_by
+from .utils import is_integer

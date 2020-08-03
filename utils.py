@@ -2,7 +2,7 @@
 # @Author: Zhang Yiwei
 # @Date:   2020-07-18 02:40:35
 # @Last Modified by:   Zhang Yiwei
-# @Last Modified time: 2020-07-30 15:02:44
+# @Last Modified time: 2020-08-03 18:44:43
 #
 # vvd Tool functions
 #
@@ -36,12 +36,18 @@ def get_current_dir():
 
 
 def pickle_save(object, save_path):
+    """
+    将object保存为pickle文件到save_path中
+    """
     save_path = save_file_path_check(save_path)
     with open(save_path, 'wb') as fp:
         pickle.dump(object, fp)
 
 
 def pickle_load(load_path):
+    """
+    从load_path中读取object
+    """
     with open(load_path, 'rb') as fp:
         return pickle.load(fp)
 
@@ -97,6 +103,9 @@ def strong_printing(string):
 
 
 def current_system():
+    """
+    返回当前操作系统名称字符串
+    """
     return platform.system()
 
 
@@ -146,6 +155,9 @@ def encode_chinese_to_unicode(input_string):
 
 
 def get_file_hash_code(file):
+    """
+    获取文件hash值
+    """
     assert os.path.exists(file)
     md5_hash = hashlib.md5()
     with open(file, "rb") as fid:
@@ -155,6 +167,9 @@ def get_file_hash_code(file):
 
 
 def my_linux_set_trace(debug=True):
+    """
+    在Linux 中加入断点
+    """
     if debug:
         Current_System = current_system()
         if Current_System == 'Linux':
@@ -419,15 +434,25 @@ def cv_rgb_imread(image_path):
 
 
 def time_stamp():
+    """
+    返回当前时间戳字符串
+    格式: 年-月-日_时-分-秒
+    """
     return time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
 
 
 def vvd_image_preprocess(image):
+    """
+    vvd 图像预处理
+    """
     new_image = image / 127.5 - 1
     return new_image
 
 
 def json_load(json_path):
+    """
+    读取json文件并返回内容字典
+    """
     try:
         assert OS_exists(json_path)
     except:
@@ -437,13 +462,37 @@ def json_load(json_path):
 
 
 def json_save(json_dict, json_path):
+    """
+    将内容字典保存为json文件
+    """
     json_path = save_file_path_check(json_path)
     with open(json_path, 'w', encoding='utf-8') as fp:
         json.dump(json_dict, fp, indent=4, cls=MyEncoder)
 
 
 def glob_recursively(path, extension):
+    """
+    在path 路径中递归查找所有扩展名为extension的文件，返回完整路径名列表
+    """
     return glob(OS_join(path, '**', '*.' + extension), recursive=True)
+
+
+def is_integer(num):
+    """
+    是否是整数，返回bool结果
+    """
+    return isinstance(num, (int, np.int, np.int32))
+
+
+def whether_divisible_by(to_be_divided, dividing):
+    """
+    to_be_divided 是否可以被 dividing 整除，返回bool结果
+    """
+    assert is_integer(to_be_divided) and is_integer(dividing)
+    if to_be_divided % dividing == 0:
+        return True
+    else:
+        return False
 
 
 if __name__ == '__main__':
