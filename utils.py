@@ -2,7 +2,7 @@
 # @Author: Zhang Yiwei
 # @Date:   2020-07-18 02:40:35
 # @Last Modified by:   Zhang Yiwei
-# @Last Modified time: 2020-08-07 15:59:57
+# @Last Modified time: 2020-08-08 16:48:40
 #
 # vvd Tool functions
 #
@@ -205,6 +205,8 @@ def zero_padding(in_array, padding_size_1, padding_size_2, padding_size_3=None, 
         rows, cols = in_array.shape
 
     if (padding_size_3 is None) and (padding_size_4 is None):
+        padding_size_1 = max(padding_size_1, 0)
+        padding_size_2 = max(padding_size_2, 0)
         assert padding_size_1 >= 0 and padding_size_2 >= 0
         if np.ndim(in_array) == 3:
             padded_array = np.zeros([rows + 2 * padding_size_1, cols + 2 * padding_size_2, ndim], dtype=type(in_array[0][0][0]))
@@ -217,6 +219,10 @@ def zero_padding(in_array, padding_size_1, padding_size_2, padding_size_3=None, 
 
     else:
         assert (padding_size_3 is not None) and (padding_size_4 is not None), "padding_size_3 padding_size_4 必须都不是none"
+        padding_size_1 = max(padding_size_1, 0)
+        padding_size_2 = max(padding_size_2, 0)
+        padding_size_3 = max(padding_size_3, 0)
+        padding_size_4 = max(padding_size_4, 0)
         assert padding_size_1 >= 0 and padding_size_2 >= 0 and padding_size_3 >= 0 and padding_size_4 >= 0
         if np.ndim(in_array) == 3:
             padded_array = np.zeros([rows + padding_size_1 + padding_size_2, cols + padding_size_3 + padding_size_4, ndim], dtype=type(in_array[0][0][0]))
