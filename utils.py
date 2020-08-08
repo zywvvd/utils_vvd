@@ -2,7 +2,7 @@
 # @Author: Zhang Yiwei
 # @Date:   2020-07-18 02:40:35
 # @Last Modified by:   Zhang Yiwei
-# @Last Modified time: 2020-08-03 18:44:43
+# @Last Modified time: 2020-08-07 15:59:57
 #
 # vvd Tool functions
 #
@@ -197,27 +197,35 @@ def zero_padding(in_array, padding_size_1, padding_size_2, padding_size_3=None, 
     :padded_array: 补零后的图像（新建矩阵，不修改原始输入）
     """
 
-    assert np.ndim(in_array) == 3
+    assert np.ndim(in_array) == 3 or np.ndim(in_array) == 2
 
-    rows, cols, ndim = in_array.shape
+    if np.ndim(in_array) == 3:
+        rows, cols, ndim = in_array.shape
+    else:
+        rows, cols = in_array.shape
 
     if (padding_size_3 is None) and (padding_size_4 is None):
         assert padding_size_1 >= 0 and padding_size_2 >= 0
-
-        padded_array = np.zeros(
-            [rows + 2 * padding_size_1, cols + 2 * padding_size_2, ndim], dtype=type(in_array[0][0][0]))
-        padded_array[padding_size_1:rows + padding_size_1,
-                     padding_size_2:cols + padding_size_2, :] = in_array
+        if np.ndim(in_array) == 3:
+            padded_array = np.zeros([rows + 2 * padding_size_1, cols + 2 * padding_size_2, ndim], dtype=type(in_array[0][0][0]))
+            padded_array[padding_size_1:rows + padding_size_1, padding_size_2:cols + padding_size_2, :] = in_array
+        elif np.ndim(in_array) == 2:
+            padded_array = np.zeros([rows + 2 * padding_size_1, cols + 2 * padding_size_2], dtype=type(in_array[0][0]))
+            padded_array[padding_size_1:rows + padding_size_1, padding_size_2:cols + padding_size_2] = in_array
+        else:
+            raise ValueError("np.ndim error")
 
     else:
-        assert (not padding_size_3 is None) and (
-            not padding_size_4 is None), "padding_size_3 padding_size_4 必须都不是none"
+        assert (padding_size_3 is not None) and (padding_size_4 is not None), "padding_size_3 padding_size_4 必须都不是none"
         assert padding_size_1 >= 0 and padding_size_2 >= 0 and padding_size_3 >= 0 and padding_size_4 >= 0
-
-        padded_array = np.zeros([rows + padding_size_1 + padding_size_2, cols +
-                                 padding_size_3 + padding_size_4, ndim], dtype=type(in_array[0][0][0]))
-        padded_array[padding_size_1:rows + padding_size_1,
-                     padding_size_3:cols + padding_size_3, :] = in_array
+        if np.ndim(in_array) == 3:
+            padded_array = np.zeros([rows + padding_size_1 + padding_size_2, cols + padding_size_3 + padding_size_4, ndim], dtype=type(in_array[0][0][0]))
+            padded_array[padding_size_1:rows + padding_size_1, padding_size_3:cols + padding_size_3, :] = in_array
+        elif np.ndim(in_array) == 2:
+            padded_array = np.zeros([rows + padding_size_1 + padding_size_2, cols + padding_size_3 + padding_size_4], dtype=type(in_array[0][0]))
+            padded_array[padding_size_1:rows + padding_size_1, padding_size_3:cols + padding_size_3] = in_array
+        else:
+            raise ValueError("np.ndim error")
 
     return padded_array
 
