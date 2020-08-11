@@ -2,7 +2,7 @@
 # @Author: Zhang Yiwei
 # @Date:   2020-07-18 02:40:35
 # @Last Modified by:   Zhang Yiwei
-# @Last Modified time: 2020-08-10 18:01:30
+# @Last Modified time: 2020-08-11 16:39:49
 #
 # vvd Tool functions
 #
@@ -422,8 +422,14 @@ def extend_image_channel(input_image):
     image = input_image.copy()
 
     shape = image.shape
+
+    max_value = np.max(image)
+    if not is_integer(max_value) and max_value > 1:
+        image /= np.max(image)
+
     if 0 < np.max(image) <= 1:
         image = (255*image).astype('uint8')
+
 
     if len(shape) == 3:
         if shape[2] == 3:
