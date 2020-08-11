@@ -2,7 +2,7 @@
 # @Author: Zhang Yiwei
 # @Date:   2020-07-18 02:40:35
 # @Last Modified by:   Zhang Yiwei
-# @Last Modified time: 2020-08-08 16:48:40
+# @Last Modified time: 2020-08-10 18:01:30
 #
 # vvd Tool functions
 #
@@ -29,9 +29,35 @@ import hashlib
 import pickle
 
 from ipdb import set_trace
+from functools import wraps
+
+
+def timer_vvd(func):
+    """
+    a timer for func
+    you could add a @timer_vvd ahead of the fun need to be timed
+    Args:
+        func (function): a function to be timed
+
+    Outputs:
+        time message: a message which tells you how much time the func spent will be printed
+    """
+    func_name = func.__name__
+
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        start_time = time.time()
+        res = func(*args, **kwargs)
+        end_time = time.time()
+        print('func: {_funcname_} runing: {_time_}s'.format(_funcname_=func_name, _time_=format(end_time - start_time, '.6f')))
+        return res
+    return wrapper
 
 
 def get_current_dir():
+    """
+    get current dir of the running file
+    """
     return os.path.dirname(os.path.realpath(__file__))
 
 
