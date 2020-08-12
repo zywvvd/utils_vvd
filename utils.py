@@ -2,7 +2,7 @@
 # @Author: Zhang Yiwei
 # @Date:   2020-07-18 02:40:35
 # @Last Modified by:   Zhang Yiwei
-# @Last Modified time: 2020-08-11 16:39:49
+# @Last Modified time: 2020-08-12 17:39:37
 #
 # vvd Tool functions
 #
@@ -527,7 +527,7 @@ def is_integer(num):
     """
     是否是整数，返回bool结果
     """
-    return isinstance(num, (int, np.int, np.int32))
+    return isinstance(num, (int, np.int, np.int32, np.uint8))
 
 
 def whether_divisible_by(to_be_divided, dividing):
