@@ -2,7 +2,7 @@
 # @Author: Zhang Yiwei
 # @Date:   2020-07-18 02:40:35
 # @Last Modified by:   Zhang Yiwei
-# @Last Modified time: 2020-08-18 15:44:14
+# @Last Modified time: 2020-08-18 15:49:17
 #
 # vvd Tool functions
 #
@@ -470,15 +470,15 @@ def plt_image_show(image, window_name='image show'):
     plt.show()
 
 
-def draw_RB_map(y_pred, labels):
-    assert isinstance(y_pred, np.ndarray) and isinstance(labels, np.ndarray)
+def draw_RB_map(y_true, y_pred):
+    assert isinstance(y_pred, np.ndarray) and isinstance(y_true, np.ndarray)
     assert np.ndim(y_pred) == 1
-    assert y_pred.shape == labels.shape
+    assert y_pred.shape == y_true.shape
 
     sorted_ids = np.argsort(y_pred+np.random.rand(y_pred.size)*1e-8)
-    sorted_labels = labels[sorted_ids]
-    ng_rank = np.where(sorted_labels == 1)[0]
-    ok_rank = np.where(sorted_labels == 0)[0]
+    sorted_y_true = y_true[sorted_ids]
+    ng_rank = np.where(sorted_y_true == 1)[0]
+    ok_rank = np.where(sorted_y_true == 0)[0]
 
     plt.figure(figsize=(25, 3))
     plt.bar(ok_rank, 1, width=1, color='b')
