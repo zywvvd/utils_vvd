@@ -2,7 +2,7 @@
 # @Author: Zhang Yiwei
 # @Date:   2020-07-18 02:40:35
 # @Last Modified by:   Zhang Yiwei
-# @Last Modified time: 2020-08-18 15:49:17
+# @Last Modified time: 2020-08-18 15:51:06
 #
 # vvd Tool functions
 #
@@ -470,7 +470,7 @@ def plt_image_show(image, window_name='image show'):
     plt.show()
 
 
-def draw_RB_map(y_true, y_pred):
+def draw_RB_map(y_true, y_pred, map_save_path=None):
     assert isinstance(y_pred, np.ndarray) and isinstance(y_true, np.ndarray)
     assert np.ndim(y_pred) == 1
     assert y_pred.shape == y_true.shape
@@ -485,6 +485,8 @@ def draw_RB_map(y_true, y_pred):
     plt.bar(ng_rank, 1, width=int(ok_rank.size/ng_rank.size/5+1), color='r')
     plt.ylim([0, 1])
     plt.xlim([0, len(ok_rank)+len(ng_rank)])
+    if map_save_path is not None:
+        plt.savefig(map_save_path)
     plt.show()
 
     plt.figure(figsize=(25, 3))
