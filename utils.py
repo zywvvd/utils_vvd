@@ -2,7 +2,7 @@
 # @Author: Zhang Yiwei
 # @Date:   2020-07-18 02:40:35
 # @Last Modified by:   Zhang Yiwei
-# @Last Modified time: 2020-08-12 17:39:37
+# @Last Modified time: 2020-08-18 15:44:14
 #
 # vvd Tool functions
 #
@@ -14,6 +14,7 @@ from os.path import exists as OS_exists
 from os.path import isdir as OS_isdir
 from os.path import dirname as OS_dirname
 
+import matplotlib.pyplot as plt
 from glob import glob
 
 import matplotlib.pyplot as plt
@@ -456,6 +457,40 @@ def image_show(image, window_name='image show'):
     '''
     temp_image = extend_image_channel(image)
     cv_image_show(image=temp_image, window_name=window_name)
+
+
+def plt_image_show(image, window_name='image show'):
+    '''
+    更加鲁棒地显示图像包括二维图像,第三维度为1的图像
+    '''
+    # temp_image = extend_image_channel(image)
+    plt.subplot(1, 1, 1)
+    plt.imshow(image, cmap='jet')
+    plt.title(window_name)
+    plt.show()
+
+
+def draw_RB_map(y_pred, labels):
+    assert isinstance(y_pred, np.ndarray) and isinstance(labels, np.ndarray)
+    assert np.ndim(y_pred) == 1
+    assert y_pred.shape == labels.shape
+
+    sorted_ids = np.argsort(y_pred+np.random.rand(y_pred.size)*1e-8)
+    sorted_labels = labels[sorted_ids]
+    ng_rank = np.where(sorted_labels == 1)[0]
+    ok_rank = np.where(sorted_labels == 0)[0]
+
+    plt.figure(figsize=(25, 3))
+    plt.bar(ok_rank, 1, width=1, color='b')
+    plt.bar(ng_rank, 1, width=int(ok_rank.size/ng_rank.size/5+1), color='r')
+    plt.ylim([0, 1])
+    plt.xlim([0, len(ok_rank)+len(ng_rank)])
+    plt.show()
+
+    plt.figure(figsize=(25, 3))
+    plt.hist(y_pred, bins=255)
+    plt.title('ng_score distribution')
+    plt.show()
 
 
 def data_show(data):
