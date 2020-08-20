@@ -31,6 +31,7 @@ import pickle
 
 from ipdb import set_trace
 from functools import wraps
+from functools import reduce
 
 
 def timer_vvd(func):
@@ -457,6 +458,24 @@ def image_show(image, window_name='image show'):
     '''
     temp_image = extend_image_channel(image)
     cv_image_show(image=temp_image, window_name=window_name)
+
+
+def image_read(image_path, channel=-1):
+    """
+    读取图像，可包含中文路径
+    Args:
+        image_path ([str]): [图像路径]
+        channel (int, optional): [图像通道数，-1为默认，0为灰度]. Defaults to -1.
+    """
+    return cv.imdecode(np.fromfile(image_path, dtype=np.uint8), channel)
+
+
+def time_reduce(*data):
+    """
+    [计算输入数据的乘积]
+    """
+    data = list(data)
+    return reduce(lambda x, y: x*y, data)
 
 
 def plt_image_show(image, window_name='image show'):
