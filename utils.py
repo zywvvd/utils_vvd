@@ -478,14 +478,19 @@ def time_reduce(*data):
     return reduce(lambda x, y: x*y, data)
 
 
-def plt_image_show(image, window_name='image show'):
+def plt_image_show(*image, window_name='image show'):
     '''
     更加鲁棒地显示图像包括二维图像,第三维度为1的图像
     '''
+    image_list = list(image)
     # temp_image = extend_image_channel(image)
-    plt.subplot(1, 1, 1)
-    plt.imshow(image, cmap='jet')
-    plt.title(window_name)
+    image_num = len(image_list)
+    col_num = int(np.ceil(image_num**0.5))
+    row_num = int(np.ceil(image_num/col_num))
+    for index, image in enumerate(image_list):
+        plt.subplot(row_num, col_num, index+1)
+        plt.imshow(image, cmap='jet')
+        plt.title(window_name)
     plt.show()
 
 
