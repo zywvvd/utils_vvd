@@ -63,11 +63,11 @@ def get_current_dir():
     return os.path.dirname(os.path.realpath(__file__))
 
 
-def pickle_save(object, save_path):
+def pickle_save(object, save_path, overwrite=False, verbose=False):
     """
     将object保存为pickle文件到save_path中
     """
-    save_path = save_file_path_check(save_path)
+    save_path = save_file_path_check(save_path, overwrite, verbose)
     with open(save_path, 'wb') as fp:
         pickle.dump(object, fp)
 
@@ -149,7 +149,7 @@ def current_split_char():
         return '/'
 
 
-def save_file_path_check(save_file_path):
+def save_file_path_check(save_file_path, overwrite=False, verbose=False):
     """
     检查要保存的文件路径
     - 如果文件已经存在 ： 在文件名与扩展名之间加入当前时间作为后缀 避免覆盖之前的文件并给出提示
@@ -158,12 +158,18 @@ def save_file_path_check(save_file_path):
     """
     assert isinstance(save_file_path, str)
     if OS_exists(save_file_path):
-        main_file_name = get_main_file_name(save_file_path)
-        new_base_name = OS_basename(save_file_path).replace(main_file_name, underline_connection(main_file_name, time_stamp()))
-        checked_save_file_path = OS_join(OS_dirname(save_file_path), new_base_name)
-        print("file path {} already exists, the file will be saved as {} instead.".format(save_file_path, checked_save_file_path))
+        if overwrite:
+            checked_save_file_path = save_file_path
+            if verbose:
+                print("file path {} already exists, the file will be overwrite.".format(save_file_path))
+        else:
+            main_file_name = get_main_file_name(save_file_path)
+            new_base_name = OS_basename(save_file_path).replace(main_file_name, underline_connection(main_file_name, time_stamp()))
+            checked_save_file_path = OS_join(OS_dirname(save_file_path), new_base_name)
+            if verbose:
+                print("file path {} already exists, the file will be saved as {} instead.".format(save_file_path, checked_save_file_path))
     else:
-        dir_check(OS_dirname(save_file_path))
+        dir_check(OS_dirname(save_file_path), verbose)
         assert OS_basename(save_file_path) != ''
         checked_save_file_path = save_file_path
     return checked_save_file_path
@@ -384,7 +390,7 @@ def uniform_split_char(string, split_char=current_split_char()):
     return string.replace('\\', split_char).replace('/', split_char)
 
 
-def dir_check(dir_path):
+def dir_check(dir_path, verbose=False):
     """
     check if `dir_path` is a real directory path
     if dir not found, make one
@@ -394,6 +400,8 @@ def dir_check(dir_path):
     if not os.path.isdir(dir_path):
         try:
             os.makedirs(dir_path)
+            if verbose:
+                print('dirs made: {}'.format(dir_path))
         except Exception as err:
             print(f'failed to make dir {dir_path}, error {err}')
         return False
@@ -489,7 +497,12 @@ def plt_image_show(*image, window_name='image show'):
     row_num = int(np.ceil(image_num/col_num))
     for index, image in enumerate(image_list):
         plt.subplot(row_num, col_num, index+1)
-        plt.imshow(image, cmap='jet')
+        if 'uint8' == image.dtype.__str__():
+            plt.imshow(image, cmap='jet', vmax=np.max(image), vmin=np.min(image))
+        elif 'int' in image.dtype.__str__():
+            plt.imshow(image, cmap='jet', vmax=np.max(image), vmin=np.min(image))
+        else:
+            plt.imshow(image)
         plt.title(window_name)
     plt.show()
 
@@ -568,11 +581,11 @@ def json_load(json_path):
         return json.load(fp)
 
 
-def json_save(json_dict, json_path):
+def json_save(json_dict, json_path, overwrite=False, verbose=False):
     """
     将内容字典保存为json文件
     """
-    json_path = save_file_path_check(json_path)
+    json_path = save_file_path_check(json_path, overwrite, verbose)
     with open(json_path, 'w', encoding='utf-8') as fp:
         json.dump(json_dict, fp, indent=4, cls=MyEncoder)
 
