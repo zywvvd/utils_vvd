@@ -116,10 +116,12 @@ def get_main_file_name(string):
     return os.path.splitext(os.path.basename(string))[0]
 
 
-def strong_printing(string):
+def strong_printing(*str_args):
     """
     print string strongly
     """
+    assert isinstance(str_args, tuple)
+    string = underline_connection(*str_args, connect_char=' ')
     print()
     boudary_size = int(max(40, len(string)*1.4))
     split_string = boudary_size*'#'
