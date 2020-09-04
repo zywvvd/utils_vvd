@@ -28,6 +28,7 @@ import os
 import platform
 import hashlib
 import pickle
+import uuid
 
 from ipdb import set_trace
 from functools import wraps
@@ -115,7 +116,7 @@ def underline_connection(*str_args, connect_char='_'):
         if isinstance(item, list):
             item = underline_connection(*item, connect_char=connect_char)
         if item != '':
-            string = string + item + connect_char
+            string = string + str(item) + connect_char
     string = string[:-1]
     return string
 
@@ -200,6 +201,11 @@ def encode_chinese_to_unicode(input_string):
         unicode_string += char
     unicode_string = unicode_string.replace('%', '#')
     return unicode_string
+
+
+def create_uuid():
+    """ create a uuid (universally unique ID) """
+    return uuid.uuid1().hex
 
 
 def get_file_hash_code(file):
