@@ -63,6 +63,18 @@ def get_current_dir():
     return os.path.dirname(os.path.realpath(__file__))
 
 
+def file_read_lines(file_path):
+    if not OS_exists(file_path):
+        print("file {} not found, None will be return".format(file_path))
+        return None
+
+    with open(file_path, "r") as f:
+        lines = f.readlines()
+        for index, line in enumerate(lines):
+            lines[index] = line.strip('\n')
+        return lines
+
+
 def pickle_save(object, save_path, overwrite=False, verbose=False):
     """
     将object保存为pickle文件到save_path中
