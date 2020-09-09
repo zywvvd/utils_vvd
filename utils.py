@@ -89,6 +89,7 @@ def pickle_load(load_path):
     """
     从load_path中读取object
     """
+    load_path = load_path.replace('\\', '/')
     with open(load_path, 'rb') as fp:
         return pickle.load(fp)
 
@@ -593,6 +594,7 @@ def json_load(json_path):
     """
     读取json文件并返回内容字典
     """
+    json_path = json_path.replace('\\', '/')
     try:
         assert OS_exists(json_path)
     except:
