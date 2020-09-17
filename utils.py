@@ -616,7 +616,7 @@ def json_save(json_dict, json_path, overwrite=False, verbose=False):
     """
     json_path = save_file_path_check(json_path, overwrite, verbose)
     with open(json_path, 'w', encoding='utf-8') as fp:
-        json.dump(json_dict, fp, indent=4, cls=MyEncoder)
+        json.dump(json_dict, fp, ensure_ascii=False, sort_keys=False, indent=4, cls=MyEncoder)
 
 
 def glob_recursively(path, extension):
