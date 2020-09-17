@@ -41,4 +41,5 @@ from .utils import plt_image_show
 from .utils import draw_RB_map
 from .utils import time_reduce
 from .utils import file_read_lines
+from .utils import file_write_lines
 from .utils import create_uuid

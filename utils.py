@@ -76,6 +76,12 @@ def file_read_lines(file_path):
         return lines
 
 
+def file_write_lines(line_list, file_path):
+    dir_check(OS_dirname(file_path))
+    with open(file_path, 'w') as f:
+        f.writelines('\n'.join(line_list))
+
+
 def pickle_save(object, save_path, overwrite=False, verbose=False):
     """
     将object保存为pickle文件到save_path中
@@ -343,9 +349,10 @@ class Loger_printer():
     def __init__(self, logger):
         self.logger = logger
 
-    def vvd_logging(self, message):
-        self.logger.info(message)
-        print(message)
+    def vvd_logging(self, *message):
+        message_str = underline_connection(message, connect_char=' ')
+        self.logger.info(message_str)
+        print(message_str)
 
 
 def log_init(log_path):
@@ -392,7 +399,7 @@ def log_init(log_path):
 
     logging.StreamHandler()
 
-    return Loger_printer(logging)
+    return Loger_printer(logging).vvd_logging
 
 
 def dir_exists(dir_path):
