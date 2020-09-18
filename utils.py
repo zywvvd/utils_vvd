@@ -354,6 +354,11 @@ class Loger_printer():
         self.logger.info(message_str)
         print(message_str)
 
+    def vvd_logging_quiet(self, *message):
+        message_str = underline_connection(message, connect_char=' ')
+        self.logger.info(message_str)
+
+
 
 def log_init(log_path):
     """
