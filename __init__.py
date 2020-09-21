@@ -43,3 +43,4 @@ from .utils import time_reduce
 from .utils import file_read_lines
 from .utils import file_write_lines
 from .utils import create_uuid
+from .utils import smart_copy

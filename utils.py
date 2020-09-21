@@ -29,6 +29,7 @@ import platform
 import hashlib
 import pickle
 import uuid
+import shutil
 
 from ipdb import set_trace
 from functools import wraps
@@ -359,8 +360,7 @@ class Loger_printer():
         self.logger.info(message_str)
 
 
-
-def log_init(log_path):
+def log_init(log_path, quiet=False):
     """
     initialize logging 
     save the logging object in `config.Parameters.Logging_Object`
@@ -404,7 +404,10 @@ def log_init(log_path):
 
     logging.StreamHandler()
 
-    return Loger_printer(logging).vvd_logging
+    if quiet:
+        return Loger_printer(logging).vvd_logging_quiet
+    else:
+        return Loger_printer(logging).vvd_logging
 
 
 def dir_exists(dir_path):
@@ -600,6 +603,24 @@ def vvd_image_preprocess(image):
     """
     new_image = image / 127.5 - 1
     return new_image
+
+
+def smart_copy(source_file_path, target_path, verbose=False):
+    """[复制文件从源到目标，如果目标已经存在则跳过]]
+
+    Args:
+        source_file_path ([str]): [源文件路径]
+        target_path ([str]): [目标文件夹/目标文件路径]
+        verbose (bool, optional): [是否显示信息]. Defaults to False.
+    """
+    assert OS_exists(source_file_path)
+    if OS_isdir(target_path):
+        target_path = OS_join(target_path, OS_basename(source_file_path))
+    if OS_exists(target_path):
+        if verbose:
+            print("{} already exists!".format(target_path))
+    else:
+        shutil.copy(source_file_path, target_path)
 
 
 def json_load(json_path):
