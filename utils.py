@@ -36,6 +36,24 @@ from functools import wraps
 from functools import reduce
 
 
+def OS_dir_list(dir_path: str):
+    """[文件夹下所有文件夹路径]
+
+    Args:
+        dir_path (str): [输入文件夹路径]
+
+    Returns:
+        [list]: [文件夹下文件夹路径（非递归）]
+    """
+    dir_name_list = os.listdir(dir_path)
+    path_list = list()
+    for dir_name in dir_name_list:
+        path = OS_join(dir_path, dir_name)
+        if OS_isdir(path):
+            path_list.append(path)
+    return path_list
+
+
 def timer_vvd(func):
     """
     a timer for func
