@@ -663,11 +663,14 @@ def json_save(json_dict, json_path, overwrite=False, verbose=False):
         json.dump(json_dict, fp, ensure_ascii=False, sort_keys=False, indent=4, cls=MyEncoder)
 
 
-def glob_recursively(path, extension):
+def glob_recursively(path, extension, recursively=True):
     """
     在path 路径中递归查找所有扩展名为extension的文件，返回完整路径名列表
     """
-    return glob(OS_join(path, '**', '*.' + extension), recursive=True)
+    if recursively:
+        return glob(OS_join(path, '**', '*.' + extension), recursive=True)
+    else:
+        return glob(OS_join(path, '*.' + extension), recursive=True)
 
 
 def is_integer(num):
