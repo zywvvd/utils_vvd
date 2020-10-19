@@ -33,7 +33,7 @@ import pickle
 import uuid
 import shutil
 
-from ipdb import set_trace
+
 from functools import wraps
 from functools import reduce
 
@@ -201,6 +201,9 @@ def save_file_path_check(save_file_path, overwrite=False, verbose=False):
     - 如文件不存在 ： 检查文件所在的文件夹目录
     返回检查后的文件路径
     """
+    if isinstance(save_file_path, Path):
+        save_file_path = str(save_file_path)
+
     assert isinstance(save_file_path, str)
     if OS_exists(save_file_path):
         if overwrite:
@@ -257,6 +260,7 @@ def my_linux_set_trace(debug=True):
     if debug:
         Current_System = current_system()
         if Current_System == 'Linux':
+            from ipdb import set_trace
             set_trace()
 
 
