@@ -14,6 +14,8 @@ from os.path import exists as OS_exists
 from os.path import isdir as OS_isdir
 from os.path import dirname as OS_dirname
 
+from pathlib2 import Path
+
 import matplotlib.pyplot as plt
 from glob import glob
 
@@ -114,7 +116,9 @@ def pickle_load(load_path):
     """
     从load_path中读取object
     """
-    load_path = load_path.replace('\\', '/')
+    assert isinstance(load_path, str) or isinstance(load_path, Path)
+    if isinstance(load_path, str):
+        load_path = load_path.replace('\\', '/')
     with open(load_path, 'rb') as fp:
         return pickle.load(fp)
 
