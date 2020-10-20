@@ -701,6 +701,21 @@ def whether_divisible_by(to_be_divided, dividing):
         return False
 
 
+def image_show_from_path(file_path):
+    """[show image from image file path]
+
+    Args:
+        file_path ([str or Path]): [path of image file]
+    """
+    assert isinstance(file_path, Path) or isinstance(file_path, str)
+    file_path = str(file_path)
+    if not OS_exists(file_path):
+        print('file: ', file_path, 'does not exist.')
+    else:
+        image = cv_rgb_imread(file_path)
+        plt_image_show(image)
+
+
 if __name__ == '__main__':
     test_name = 'abc/sadf/gsdf.sadf.test'
     strong_printing(test_name)
