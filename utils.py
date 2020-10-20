@@ -653,11 +653,13 @@ def json_load(json_path):
     """
     读取json文件并返回内容字典
     """
-    json_path = json_path.replace('\\', '/')
+    assert isinstance(json_path, str) or isinstance(json_path, Path)
+    if isinstance(json_path, str):
+        json_path = json_path.replace('\\', '/')
     try:
         assert OS_exists(json_path)
-    except:
-        print('file not found !')
+    except Exception as e:
+        print('file not found !', e)
     with open(json_path, 'r') as fp:
         return json.load(fp)
 
