@@ -705,6 +705,19 @@ def whether_divisible_by(to_be_divided, dividing):
         return False
 
 
+def cv_rgb_imwrite(rgb_image, image_save_path):
+    """
+    [cv2 save a rgb image]
+    Args:
+        rgb_image ([np.array]): [rgb image]
+        image_save_path ([str/Path]): [image save path]
+    """
+    bgr_image = cv.cvtColor(rgb_image, cv.COLOR_RGB2BGR)
+    image_save_path = Path(image_save_path)
+    image_save_path.parent.mkdir(parents=True, exist_ok=True)
+    cv.imwrite(str(image_save_path), bgr_image)
+
+
 def image_show_from_path(file_path):
     """[show image from image file path]
 
