@@ -155,7 +155,9 @@ def get_main_file_name(string):
     """
     return file name without extension
     """
-    assert isinstance(string, str)
+    assert isinstance(string, str) or isinstance(string, Path)
+    if isinstance(string, Path):
+        string = str(string)
     return os.path.splitext(os.path.basename(string))[0]
 
 
