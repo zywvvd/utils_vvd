@@ -610,6 +610,8 @@ def cv_rgb_imread(image_path):
     """
     按照RGB顺序使用cv读取图像
     """
+    if isinstance(image_path, Path):
+        image_path = str(image_path)
     image = cv.imread(image_path)
     b, g, r = cv.split(image)
     image = cv.merge([r, g, b])
