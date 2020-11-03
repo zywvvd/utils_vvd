@@ -560,7 +560,16 @@ def plt_image_show(*image, window_name='image show'):
     image_num = len(image_list)
     col_num = int(np.ceil(image_num**0.5))
     row_num = int(np.ceil(image_num/col_num))
-    for index, image in enumerate(image_list):
+    for index, image_item in enumerate(image_list):
+        if isinstance(image_item, tuple):
+            assert len(image_item) == 2
+            image = image_item[0]
+            current_name = image_item[1]
+            print_name = current_name
+        else:
+            image = image_item
+            print_name = window_name
+
         plt.subplot(row_num, col_num, index+1)
         if 'uint8' == image.dtype.__str__():
             plt.imshow(image, cmap='jet', vmax=np.max(image), vmin=np.min(image))
@@ -568,7 +577,7 @@ def plt_image_show(*image, window_name='image show'):
             plt.imshow(image, cmap='jet', vmax=np.max(image), vmin=np.min(image))
         else:
             plt.imshow(image)
-        plt.title(window_name)
+        plt.title(print_name)
     plt.show()
 
 
