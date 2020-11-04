@@ -45,4 +45,6 @@ from .utils import file_write_lines
 from .utils import create_uuid
 from .utils import smart_copy
 from .utils import OS_dir_list
+from .utils import erode
+from .utils import open_op
 from .utils import image_show_from_path

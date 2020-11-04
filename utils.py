@@ -19,7 +19,6 @@ from pathlib2 import Path
 import matplotlib.pyplot as plt
 from glob import glob
 
-import matplotlib.pyplot as plt
 import numpy as np
 import json
 import time
@@ -741,6 +740,23 @@ def image_show_from_path(file_path):
     else:
         image = cv_rgb_imread(file_path)
         plt_image_show(image)
+
+
+def erode(mat, iterations=1, kernel_size=3):
+    """ dilate 2D binary matrix by one pixel """
+    assert isinstance(mat, np.ndarray) and mat.dtype == np.bool
+    kernel = np.ones((kernel_size, kernel_size), np.uint8)
+    mat_dilated = cv.erode(mat.astype(np.uint8), kernel, iterations=iterations)
+    return mat_dilated > 0
+
+
+def open_op(mat, iterations=1, kernel_size=3):
+    """ dilate 2D binary matrix by one pixel """
+    assert isinstance(mat, np.ndarray) and mat.dtype == np.bool
+    kernel = np.ones((kernel_size, kernel_size), np.uint8)
+    mat_dilated = cv.erode(mat.astype(np.uint8), kernel, iterations=iterations)
+    mat_dilated = cv.dilate(mat_dilated.astype(np.uint8), kernel, iterations=iterations)
+    return mat_dilated > 0
 
 
 if __name__ == '__main__':
