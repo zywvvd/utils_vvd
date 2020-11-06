@@ -3,6 +3,7 @@
 # @Date:   2020-07-18 03:40:39
 # @Last Modified by:   Zhang Yiwei
 # @Last Modified time: 2020-08-18 15:47:04
+from .utils import convert_plt_to_rgb_image
 from .utils import image_show
 from .utils import cv_rgb_imread
 from .utils import OS_basename

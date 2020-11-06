@@ -15,8 +15,11 @@ from os.path import isdir as OS_isdir
 from os.path import dirname as OS_dirname
 
 from pathlib2 import Path
+import PIL.Image as Image
 
 import matplotlib.pyplot as plt
+from matplotlib.backends.backend_agg import FigureCanvasAgg
+
 from glob import glob
 
 import numpy as np
@@ -550,7 +553,7 @@ def time_reduce(*data):
     return reduce(lambda x, y: x*y, data)
 
 
-def plt_image_show(*image, window_name='image show'):
+def plt_image_show(*image, window_name='image show', array_res=False):
     '''
     更加鲁棒地显示图像包括二维图像,第三维度为1的图像
     '''
@@ -577,7 +580,24 @@ def plt_image_show(*image, window_name='image show'):
         else:
             plt.imshow(image)
         plt.title(print_name)
-    plt.show()
+    if not array_res:
+        plt.show()
+    else:
+        return convert_plt_to_rgb_image(plt)
+
+
+def convert_plt_to_rgb_image(plt):
+    # Convert a Matplotlib figure to a 3D numpy array with RGB channels and return it
+    canvas = FigureCanvasAgg(plt.gcf())
+    canvas.draw()
+    w, h = canvas.get_width_height()
+    buf = np.fromstring(canvas.tostring_argb(), dtype=np.uint8)
+    buf.shape = (w, h, 4)
+    buf = np.roll(buf, 3, axis=2)
+    image = Image.frombytes("RGBA", (w, h), buf.tostring())
+    image = np.asarray(image)
+    rgb_image = image[:, :, :3]
+    return rgb_image
 
 
 def draw_RB_map(y_true, y_pred, map_save_path=None):
