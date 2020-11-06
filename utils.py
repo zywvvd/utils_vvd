@@ -222,7 +222,7 @@ def save_file_path_check(save_file_path, overwrite=False, verbose=False):
             if verbose:
                 print("file path {} already exists, the file will be saved as {} instead.".format(save_file_path, checked_save_file_path))
     else:
-        dir_check(OS_dirname(save_file_path), verbose)
+        dir_check(str(Path(save_file_path).parent), verbose)
         assert OS_basename(save_file_path) != ''
         checked_save_file_path = save_file_path
     return checked_save_file_path
