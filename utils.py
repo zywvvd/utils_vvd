@@ -779,7 +779,69 @@ def open_op(mat, iterations=1, kernel_size=3):
     return mat_dilated > 0
 
 
+def get_gpu_str_as_you_wish(gpu_num_wanted, verbose=0):
+    """[get empty gpu index str as needed]
+
+    Args:
+        gpu_num_wanted ([int]): [the num of gpu you want]
+
+    Returns:
+        [str]: [gpu str returned]
+    """
+    try:
+        import pynvml
+    except Exception as e:
+        print('can not import pynvml.', e)
+        print('please make sure pynvml is installed correctly.')
+        print('a simple pip install nvidia-ml-py3 may help.')
+        print('now a 0 will be return')
+        return '0'
+
+    NUM_EXPAND = 1024 * 1024
+
+    try:
+        # 初始化工具
+        pynvml.nvmlInit()
+    except Exception as e:
+        print('pynvml.nvmlInit failed:', e)
+        print('now a 0 will be return')
+        return '0'
+
+    # 获取Nvidia GPU块数
+    gpuDeviceCount = pynvml.nvmlDeviceGetCount()
+    returned_gpu_num = max(min(gpu_num_wanted, gpuDeviceCount), 0)
+    if verbose:
+        print(returned_gpu_num, 'gpu index will be return.')
+
+    gpu_index_and_free_memory_list = list()
+    for index in range(gpuDeviceCount):
+        handle = pynvml.nvmlDeviceGetHandleByIndex(index)
+        info = pynvml.nvmlDeviceGetMemoryInfo(handle)
+        gpu_memory_total = info.total / NUM_EXPAND
+        gpu_memory_used = info.used / NUM_EXPAND
+        gpu_index_and_free_memory_list.append([index, gpu_memory_total - gpu_memory_used])
+        if verbose:
+            print(f'gpu {index}: total_memory: {gpu_memory_total} memory_left: {gpu_memory_total - gpu_memory_used}')
+
+    gpu_index_and_free_memory_list.sort(key=lambda x: - x[1])
+
+    gpu_index_picked_list = list()
+
+    for i in range(returned_gpu_num):
+        gpu_index_picked_list.append(str(gpu_index_and_free_memory_list[i][0]))
+
+    gpu_index_str = ','.join(gpu_index_picked_list)
+    if verbose:
+        print(f'return gpu str: {gpu_index_str}')
+
+    # 关闭工具
+    pynvml.nvmlShutdown()
+
+    return gpu_index_str
+
+
 if __name__ == '__main__':
     test_name = 'abc/sadf/gsdf.sadf.test'
     strong_printing(test_name)
     print(underline_connection())
+    get_gpu_str_as_you_wish(3, verbose=1)
