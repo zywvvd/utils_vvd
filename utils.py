@@ -807,11 +807,13 @@ def get_gpu_str_as_you_wish(gpu_num_wanted, verbose=0):
         print('now a 0 will be return')
         return '0'
 
+    # 驱动信息
+    if verbose:
+        print("GPU driver version: ", pynvml.nvmlSystemGetDriverVersion())
+
     # 获取Nvidia GPU块数
     gpuDeviceCount = pynvml.nvmlDeviceGetCount()
     returned_gpu_num = max(min(gpu_num_wanted, gpuDeviceCount), 0)
-    if verbose:
-        print(returned_gpu_num, 'gpu index will be return.')
 
     gpu_index_and_free_memory_list = list()
     for index in range(gpuDeviceCount):
@@ -821,6 +823,9 @@ def get_gpu_str_as_you_wish(gpu_num_wanted, verbose=0):
         gpu_memory_used = info.used / NUM_EXPAND
         gpu_index_and_free_memory_list.append([index, gpu_memory_total - gpu_memory_used])
         if verbose:
+            if index == 0:
+                device_name = pynvml.nvmlDeviceGetName(handle)
+                print('GPU device name:', device_name)
             print(f'gpu {index}: total_memory: {gpu_memory_total} memory_left: {gpu_memory_total - gpu_memory_used}')
 
     gpu_index_and_free_memory_list.sort(key=lambda x: - x[1])
@@ -832,12 +837,67 @@ def get_gpu_str_as_you_wish(gpu_num_wanted, verbose=0):
 
     gpu_index_str = ','.join(gpu_index_picked_list)
     if verbose:
+        print(returned_gpu_num, 'gpu index will be return.')
         print(f'return gpu str: {gpu_index_str}')
 
     # 关闭工具
     pynvml.nvmlShutdown()
 
     return gpu_index_str
+
+
+def boxes_painter(rgb_image, box_list, label_list=None, class_name_dict=None):
+    """[paint boxex and labels on image]
+
+    Args:
+        rgb_image ([np.array(uint8)]): [np array image as type uint8]
+        box_list ([list of list of 4 int]): [list of box like [10(xmin), 20(ymin), 50(xmax), 60(ymax)]]
+        label_list ([list of int]): [class indexes of boxes in box_list] (could be none)
+        class_name_dict ([dict - index: class_name]): [key is index and value is the name in type of str] (could be none)
+    Returns:
+        [rgb image]: [image with boxes and labels]
+    """
+    from PIL import ImageFont, ImageDraw, Image
+
+    color = 'LightSkyBlue'
+    line_thickness = 3
+
+    pil_image = Image.fromarray(rgb_image)
+    draw = ImageDraw.Draw(pil_image)
+
+    try:
+        font = ImageFont.truetype('arial.ttf', 24)
+    except IOError:
+        font = ImageFont.load_default()
+
+    text_height = 22
+
+    # draw boxes
+    for index, bbox in enumerate(box_list):
+
+        left, top, right, bottom = np.array(bbox).astype('int').tolist()
+
+        # draw box
+        draw.line([(left, top), (left, bottom), (right, bottom), (right, top), (left, top)], width=line_thickness, fill=color)
+
+        # draw text
+        if label_list:
+            if class_name_dict:
+                display_str = class_name_dict[label_list[index]]
+            else:
+                display_str = str(label_list[index])
+            text_width, text_height = font.getsize(display_str)
+
+        text_bottom = top
+        margin = np.ceil(0.05 * text_height)
+
+        draw.rectangle([(left - 1, text_bottom - text_height - 2 * margin), (right + 1, text_bottom)], fill=color)
+        draw.text((int(left + (right - left)/2 - text_width/2), text_bottom - text_height - margin), display_str, fill='black', font=font)
+
+    # get image with box and index
+    array_image_with_box = np.asarray(pil_image)
+
+    return array_image_with_box
 
 
 if __name__ == '__main__':
