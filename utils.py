@@ -382,13 +382,13 @@ class Loger_printer():
         self.logger = logger
 
     def vvd_logging(self, *message):
-        message_str = underline_connection(message, connect_char=' ')
-        self.logger.info(message_str)
-        print(message_str)
+        for message_str in message:
+            print(message_str)
+            self.logger.info(message_str)
 
     def vvd_logging_quiet(self, *message):
-        message_str = underline_connection(message, connect_char=' ')
-        self.logger.info(message_str)
+        for message_str in message:
+            self.logger.info(message_str)
 
 
 def log_init(log_path, quiet=False):
@@ -462,6 +462,8 @@ def dir_check(dir_path, verbose=False):
     check if `dir_path` is a real directory path
     if dir not found, make one
     """
+    if isinstance(dir_path, Path):
+        dir_path = str(dir_path)
     assert isinstance(dir_path, str)
     dir_path = uniform_split_char(dir_path)
     if not os.path.isdir(dir_path):
