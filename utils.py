@@ -835,9 +835,9 @@ def get_gpu_str_as_you_wish(gpu_num_wanted, verbose=0):
     gpu_index_picked_list = list()
 
     for i in range(returned_gpu_num):
-        gpu_index_picked_list.append(str(gpu_index_and_free_memory_list[i][0]))
+        gpu_index_picked_list.append(gpu_index_and_free_memory_list[i][0])
 
-    gpu_index_str = ','.join(gpu_index_picked_list)
+    gpu_index_str = ','.join([str(index) for index in gpu_index_picked_list])
     if verbose:
         print(returned_gpu_num, 'gpu index will be return.')
         print(f'return gpu str: {gpu_index_str}')
