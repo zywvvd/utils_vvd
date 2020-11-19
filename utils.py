@@ -845,7 +845,7 @@ def get_gpu_str_as_you_wish(gpu_num_wanted, verbose=0):
     # 关闭工具
     pynvml.nvmlShutdown()
 
-    return gpu_index_str
+    return gpu_index_str, gpu_index_picked_list
 
 
 def boxes_painter(rgb_image, box_list, label_list=None, class_name_dict=None):
