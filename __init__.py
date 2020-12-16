@@ -51,4 +51,5 @@ from .utils import open_op
 from .utils import image_show_from_path
 from .utils import get_gpu_str_as_you_wish
 from .utils import boxes_painter
+from .utils import cv_rgb_bgr_convert
 from .utils import cv_rgb_imwrite

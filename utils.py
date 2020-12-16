@@ -650,6 +650,21 @@ def cv_rgb_imread(image_path):
     return image
 
 
+def cv_rgb_bgr_convert(image):
+    """[convert rgb to bgr or bgr ro rgb]
+
+    Args:
+        image ([np.array(uint8)]): [uint8 image]
+
+    Returns:
+        [image]: [r and b swapped]
+    """
+    b, g, r = cv.split(image)
+    image = cv.merge([r, g, b])
+
+    return image
+
+
 def time_stamp():
     """
     返回当前时间戳字符串
