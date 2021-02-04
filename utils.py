@@ -14,7 +14,8 @@ from os.path import exists as OS_exists
 from os.path import isdir as OS_isdir
 from os.path import dirname as OS_dirname
 
-from pathlib2 import Path
+from pathlib2 import Path as Path2
+from pathlib import Path
 import PIL.Image as Image
 
 import matplotlib.pyplot as plt
@@ -119,7 +120,7 @@ def pickle_load(load_path):
     """
     从load_path中读取object
     """
-    assert isinstance(load_path, str) or isinstance(load_path, Path)
+    assert isinstance(load_path, str) or is_path_obj(load_path)
     if isinstance(load_path, str):
         load_path = load_path.replace('\\', '/')
     with open(load_path, 'rb') as fp:
@@ -158,8 +159,8 @@ def get_main_file_name(string):
     """
     return file name without extension
     """
-    assert isinstance(string, str) or isinstance(string, Path)
-    if isinstance(string, Path):
+    assert isinstance(string, str) or is_path_obj(string)
+    if is_path_obj(string):
         string = str(string)
     return os.path.splitext(os.path.basename(string))[0]
 
@@ -206,7 +207,7 @@ def save_file_path_check(save_file_path, overwrite=False, verbose=False):
     - 如文件不存在 ： 检查文件所在的文件夹目录
     返回检查后的文件路径
     """
-    if isinstance(save_file_path, Path):
+    if is_path_obj(save_file_path):
         save_file_path = str(save_file_path)
 
     assert isinstance(save_file_path, str)
@@ -462,7 +463,7 @@ def dir_check(dir_path, verbose=False):
     check if `dir_path` is a real directory path
     if dir not found, make one
     """
-    if isinstance(dir_path, Path):
+    if is_path_obj(dir_path):
         dir_path = str(dir_path)
     assert isinstance(dir_path, str)
     dir_path = uniform_split_char(dir_path)
@@ -637,11 +638,18 @@ def data_show(data):
     fig.show()
 
 
+def is_path_obj(path):
+    if isinstance(path, Path) or isinstance(path, Path2):
+        return True
+    else:
+        return False
+
+
 def cv_rgb_imread(image_path):
     """
     按照RGB顺序使用cv读取图像
     """
-    if isinstance(image_path, Path):
+    if is_path_obj(image_path):
         image_path = str(image_path)
     image = cv.imread(image_path)
     b, g, r = cv.split(image)
@@ -770,7 +778,7 @@ def image_show_from_path(file_path):
     Args:
         file_path ([str or Path]): [path of image file]
     """
-    assert isinstance(file_path, Path) or isinstance(file_path, str)
+    assert is_path_obj(file_path) or isinstance(file_path, str)
     file_path = str(file_path)
     if not OS_exists(file_path):
         print('file: ', file_path, 'does not exist.')
