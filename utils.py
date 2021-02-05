@@ -556,7 +556,7 @@ def time_reduce(*data):
     return reduce(lambda x, y: x*y, data)
 
 
-def plt_image_show(*image, window_name='image show', array_res=False):
+def plt_image_show(*image, window_name='image show', array_res=False, full_screen=False):
     '''
     更加鲁棒地显示图像包括二维图像,第三维度为1的图像
     '''
@@ -565,6 +565,8 @@ def plt_image_show(*image, window_name='image show', array_res=False):
     image_num = len(image_list)
     col_num = int(np.ceil(image_num**0.5))
     row_num = int(np.ceil(image_num/col_num))
+    if full_screen:
+        plt.figure(figsize=(19.2, 10.8))
     for index, image_item in enumerate(image_list):
         if isinstance(image_item, tuple):
             assert len(image_item) == 2
