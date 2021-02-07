@@ -741,6 +741,7 @@ def glob_recursively(path, extension, recursively=True):
     """
     在path 路径中递归查找所有扩展名为extension的文件，返回完整路径名列表
     """
+    path = str(path)
     if recursively:
         return glob(OS_join(path, '**', '*.' + extension), recursive=True)
     else:
