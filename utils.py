@@ -718,8 +718,12 @@ def json_load(json_path):
         assert OS_exists(json_path)
     except Exception as e:
         print('file not found !', e)
-    with open(json_path, 'r') as fp:
-        return json.load(fp)
+    try:
+        with open(json_path, 'r') as fp:
+            return json.load(fp)
+    except Exception as e:
+        with open(json_path, 'r', encoding='utf-8') as fp:
+            return json.load(fp)
 
 
 def json_save(json_dict, json_path, overwrite=False, verbose=False):
