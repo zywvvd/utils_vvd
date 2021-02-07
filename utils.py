@@ -446,6 +446,7 @@ def dir_exists(dir_path):
     """
     check if dir exists
     """
+    dir_path = str(dir_path)
     if not os.path.isdir(dir_path):
         raise TypeError("dir not found")
 
@@ -463,8 +464,8 @@ def dir_check(dir_path, verbose=False):
     check if `dir_path` is a real directory path
     if dir not found, make one
     """
-    if is_path_obj(dir_path):
-        dir_path = str(dir_path)
+
+    dir_path = str(dir_path)
     assert isinstance(dir_path, str)
     dir_path = uniform_split_char(dir_path)
     if not os.path.isdir(dir_path):
@@ -545,6 +546,7 @@ def image_read(image_path, channel=-1):
         image_path ([str]): [图像路径]
         channel (int, optional): [图像通道数，-1为默认，0为灰度]. Defaults to -1.
     """
+    image_path = str(image_path)
     return cv.imdecode(np.fromfile(image_path, dtype=np.uint8), channel)
 
 
@@ -651,8 +653,7 @@ def cv_rgb_imread(image_path):
     """
     按照RGB顺序使用cv读取图像
     """
-    if is_path_obj(image_path):
-        image_path = str(image_path)
+    image_path = str(image_path)
     image = cv.imread(image_path)
     b, g, r = cv.split(image)
     image = cv.merge([r, g, b])
@@ -699,6 +700,7 @@ def smart_copy(source_file_path, target_path, verbose=False):
         target_path ([str]): [目标文件夹/目标文件路径]
         verbose (bool, optional): [是否显示信息]. Defaults to False.
     """
+    source_file_path = str(source_file_path)
     assert OS_exists(source_file_path)
     if OS_isdir(target_path):
         target_path = OS_join(target_path, OS_basename(source_file_path))
@@ -713,7 +715,7 @@ def json_load(json_path):
     """
     读取json文件并返回内容字典
     """
-    assert isinstance(json_path, str) or isinstance(json_path, Path)
+    json_path = str(json_path)
     if isinstance(json_path, str):
         json_path = json_path.replace('\\', '/')
     try:
@@ -732,6 +734,7 @@ def json_save(json_dict, json_path, overwrite=False, verbose=False):
     """
     将内容字典保存为json文件
     """
+    json_path = str(json_path)
     json_path = save_file_path_check(json_path, overwrite, verbose)
     with open(json_path, 'w', encoding='utf-8') as fp:
         json.dump(json_dict, fp, ensure_ascii=False, sort_keys=False, indent=4, cls=MyEncoder)
