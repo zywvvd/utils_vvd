@@ -36,9 +36,32 @@ import pickle
 import uuid
 import shutil
 
+from tqdm import tqdm
 
 from functools import wraps
 from functools import reduce
+
+popular_image_suffixes = ['png', 'jpg', 'jpeg', 'bmp']
+
+
+def image_formate_transfer(origin_dir, tar_dir, origin_suffix, tar_suffix, recursively=False):
+
+    if origin_suffix.lower() not in popular_image_suffixes:
+        raise Warning(f'origin_suffix {origin_suffix} is not an usually image file suffix')
+
+    if tar_suffix.lower() not in popular_image_suffixes:
+        raise Warning(f'tar_suffix {tar_suffix} is not an usually image file suffix')
+
+    assert Path(origin_dir).is_dir(), f"origin_dir {origin_dir} does not exist"
+    assert Path(tar_dir).is_dir(), f"origin_dir {tar_dir} does not exist"
+
+    image_path_list = glob_recursively(origin_dir, origin_suffix, recursively=recursively)
+
+    for image_path in tqdm(image_path_list, desc=f"converting suffix from {origin_suffix} to {tar_suffix}"):
+        img = Image.open(image_path)
+        file_name = Path(image_path).stem
+        new_file_name = str(Path(tar_dir) / (file_name + '.' + tar_suffix))
+        img.save(new_file_name)
 
 
 def OS_dir_list(dir_path: str):
