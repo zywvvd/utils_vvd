@@ -282,17 +282,6 @@ def get_file_hash_code(file):
     return digest
 
 
-def my_linux_set_trace(debug=True):
-    """
-    在Linux 中加入断点
-    """
-    if debug:
-        Current_System = current_system()
-        if Current_System == 'Linux':
-            from ipdb import set_trace
-            set_trace()
-
-
 def zero_padding(in_array, padding_size_1, padding_size_2, padding_size_3=None, padding_size_4=None):
     """
     四周补零，以此避免边界判断(仅用于三通道图像)
