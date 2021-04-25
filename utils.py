@@ -893,7 +893,7 @@ def get_gpu_str_as_you_wish(gpu_num_wanted, verbose=0):
     return gpu_index_str, gpu_index_picked_list
 
 
-def boxes_painter(rgb_image, box_list, label_list=None, class_name_dict=None):
+def boxes_painter(rgb_image, box_list, label_list=None, score_list=None, class_name_dict=None):
     """[paint boxex and labels on image]
 
     Args:
@@ -904,16 +904,28 @@ def boxes_painter(rgb_image, box_list, label_list=None, class_name_dict=None):
     Returns:
         [rgb image]: [image with boxes and labels]
     """
-    from PIL import ImageFont, ImageDraw, Image
+    if label_list is not None:
+        assert len(label_list) == len(box_list)
 
-    color = 'LightSkyBlue'
+    if score_list is not None:
+        assert len(score_list) == len(box_list)
+    
+    from PIL import ImageFont, ImageDraw, Image
+    import matplotlib.font_manager as fm
+
+    color_list = [(159, 20, 98), (95, 32, 219), (22, 92, 189), (56, 233, 120), (23, 180, 100), (78, 69, 20), (97, 202, 39), (65, 179, 135), (163, 159, 219)]
     line_thickness = 3
 
     pil_image = Image.fromarray(rgb_image)
     draw = ImageDraw.Draw(pil_image)
 
+    fontsize = 24
+
     try:
-        font = ImageFont.truetype('arial.ttf', 24)
+        if current_system() == 'Windows':
+            font = ImageFont.truetype('arial.ttf', fontsize)
+        else:
+            font = ImageFont.truetype(fm.findfont(fm.FontProperties(family='DejaVu Sans')),fontsize)
     except IOError:
         font = ImageFont.load_default()
 
@@ -923,17 +935,29 @@ def boxes_painter(rgb_image, box_list, label_list=None, class_name_dict=None):
     for index, bbox in enumerate(box_list):
 
         left, top, right, bottom = np.array(bbox).astype('int').tolist()
-
+        if label_list:
+            color = color_list[label_list[index] % len(color_list)]
+        else:
+            color = color[1]
         # draw box
         draw.line([(left, top), (left, bottom), (right, bottom), (right, top), (left, top)], width=line_thickness, fill=color)
 
         # draw text
+        display_str = ""
+
         if label_list:
             if class_name_dict:
-                display_str = class_name_dict[label_list[index]]
+                display_str += class_name_dict[label_list[index]]
             else:
-                display_str = str(label_list[index])
-            text_width, text_height = font.getsize(display_str)
+                display_str += str(label_list[index])
+
+        if score_list:
+            if display_str is not "":
+                display_str += ' '
+            score = score_list[index]
+            display_str += str(format(score, '.3f'))
+
+        text_width, text_height = font.getsize(display_str)
 
         text_bottom = top
         margin = np.ceil(0.05 * text_height)
