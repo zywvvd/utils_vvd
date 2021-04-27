@@ -723,7 +723,7 @@ def smart_copy(source_file_path, target_path, verbose=False):
         shutil.copy(source_file_path, target_path)
 
 
-def json_load(json_path):
+def json_load(json_path, verbose=False):
     """
     读取json文件并返回内容字典
     """
@@ -733,13 +733,26 @@ def json_load(json_path):
     try:
         assert OS_exists(json_path)
     except Exception as e:
-        print('file not found !', e)
+        if verbose:
+            print('file not found !', e)
     try:
         with open(json_path, 'r') as fp:
             return json.load(fp)
     except Exception as e:
+        if verbose:
+            print('simple json load failed, try utf-8', e)
+    try:
         with open(json_path, 'r', encoding='utf-8') as fp:
             return json.load(fp)
+    except Exception as e:
+        if verbose:
+            print('utf-8 json load failed, try gbk', e)
+    try:
+        with open(json_path, 'r', encoding='gbk') as fp:
+            return json.load(fp)
+    except Exception as e:
+        if verbose:
+            print('gbk json load failed!', e)        
 
 
 def json_save(json_dict, json_path, overwrite=False, verbose=False):
@@ -893,7 +906,7 @@ def get_gpu_str_as_you_wish(gpu_num_wanted, verbose=0):
     return gpu_index_str, gpu_index_picked_list
 
 
-def boxes_painter(rgb_image, box_list, label_list=None, score_list=None, class_name_dict=None):
+def boxes_painter(rgb_image, box_list, label_list=None, score_list=None, color_list=None):
     """[paint boxex and labels on image]
 
     Args:
@@ -910,10 +923,13 @@ def boxes_painter(rgb_image, box_list, label_list=None, score_list=None, class_n
     if score_list is not None:
         assert len(score_list) == len(box_list)
     
+    if color_list is not None:
+        assert len(color_list) == len(box_list)
+
     from PIL import ImageFont, ImageDraw, Image
     import matplotlib.font_manager as fm
 
-    color_list = [(159, 20, 98), (95, 32, 219), (22, 92, 189), (56, 233, 120), (23, 180, 100), (78, 69, 20), (97, 202, 39), (65, 179, 135), (163, 159, 219)]
+    color_list_default = [(159, 20, 98), (95, 32, 219), (222, 92, 189), (56, 233, 120), (23, 180, 100), (78, 69, 20), (97, 202, 39), (65, 179, 135), (163, 159, 219)]
     line_thickness = 3
 
     pil_image = Image.fromarray(rgb_image)
@@ -935,10 +951,13 @@ def boxes_painter(rgb_image, box_list, label_list=None, score_list=None, class_n
     for index, bbox in enumerate(box_list):
 
         left, top, right, bottom = np.array(bbox).astype('int').tolist()
-        if label_list:
-            color = color_list[label_list[index] % len(color_list)]
+        if color_list is not None:
+            color = color_list[index]
         else:
-            color = color[1]
+            if label_list:
+                color = color_list_default[label_list[index] % len(color_list)]
+            else:
+                color = color[1]
         # draw box
         draw.line([(left, top), (left, bottom), (right, bottom), (right, top), (left, top)], width=line_thickness, fill=color)
 
@@ -946,10 +965,7 @@ def boxes_painter(rgb_image, box_list, label_list=None, score_list=None, class_n
         display_str = ""
 
         if label_list:
-            if class_name_dict:
-                display_str += class_name_dict[label_list[index]]
-            else:
-                display_str += str(label_list[index])
+            display_str += str(label_list[index])
 
         if score_list:
             if display_str is not "":
@@ -963,7 +979,11 @@ def boxes_painter(rgb_image, box_list, label_list=None, score_list=None, class_n
         margin = np.ceil(0.05 * text_height)
 
         draw.rectangle([(left - 1, text_bottom - text_height - 2 * margin), (right + 1, text_bottom)], fill=color)
-        draw.text((int(left + (right - left)/2 - text_width/2), text_bottom - text_height - margin), display_str, fill='black', font=font)
+        if np.mean(np.array(color)) < 250:
+            font_color = 'yellow'
+        else:
+            font_color = 'red'
+        draw.text((int(left + (right - left)/2 - text_width/2), text_bottom - text_height - margin), display_str, fill=font_color, font=font)
 
     # get image with box and index
     array_image_with_box = np.asarray(pil_image)
