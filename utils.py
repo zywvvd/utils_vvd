@@ -64,6 +64,12 @@ def image_formate_transfer(origin_dir, tar_dir, origin_suffix, tar_suffix, recur
         img.save(new_file_name)
 
 
+def get_mac_address():
+    mac=uuid.UUID(int = uuid.getnode()).hex[-12:].upper()
+    #return '%s:%s:%s:%s:%s:%s' % (mac[0:2],mac[2:4],mac[4:6],mac[6:8],mac[8:10],mac[10:])
+    return ":".join([mac[e:e+2] for e in range(0,11,2)])
+
+
 def OS_dir_list(dir_path: str):
     """[文件夹下所有文件夹路径]
 
