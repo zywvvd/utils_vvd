@@ -593,9 +593,9 @@ def plt_image_show(*image, window_name='image show', array_res=False, full_scree
 
         plt.subplot(row_num, col_num, index+1)
         if 'uint8' == image.dtype.__str__():
-            plt.imshow(image, cmap='jet', vmax=np.max(image), vmin=np.min(image))
+            plt.imshow(image, vmax=np.max(image), vmin=np.min(image))
         elif 'int' in image.dtype.__str__():
-            plt.imshow(image, cmap='jet', vmax=np.max(image), vmin=np.min(image))
+            plt.imshow(image, vmax=np.max(image), vmin=np.min(image))
         else:
             plt.imshow(image)
         plt.title(print_name)
