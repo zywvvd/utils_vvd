@@ -89,6 +89,68 @@ def OS_dir_list(dir_path: str):
     return path_list
 
 
+def crop_data_around_boxes(image, crop_box):
+    """make a image crop from a image safely"""
+
+    ndim = image.ndim
+    height, width = image.shape[:2]
+
+    ori_left, ori_top, ori_right, ori_bottom = 0, 0, width, height
+
+    crop_left, crop_top, crop_right, crop_bottom = crop_box
+
+    assert crop_right > crop_left and crop_bottom > crop_top
+
+    crop_width = crop_right - crop_left
+    crop_height = crop_bottom - crop_top
+
+    cut_left = max(crop_left, ori_left)
+    cut_right = max(min(ori_right, crop_right), cut_left)
+    cut_top = max(ori_top, crop_top)
+    cut_bottom = max(min(ori_bottom, crop_bottom), cut_top)
+
+    crop_ori = image[cut_top:cut_bottom, cut_left:cut_right, ...]
+
+    if cut_right - cut_left != crop_width or cut_bottom - cut_top != crop_height:
+
+        # out of boundary
+        if ndim == 3:
+            crop_ori_temp = np.zeros([crop_height, crop_width, 3], dtype='uint8')
+        elif ndim == 2:
+            crop_ori_temp = np.zeros([crop_height, crop_width], dtype='uint8')
+        else:
+            raise RuntimeError(f"error image shape {image.shape} ndim {ndim}")
+
+        win_left = cut_left - crop_left
+        win_right = max(cut_right - crop_left, win_left)
+        win_top = cut_top - crop_top
+        win_bottom = max(cut_bottom - crop_top, win_top)
+
+        crop_ori_temp[win_top:win_bottom, win_left:win_right, ...] = crop_ori
+        crop_ori = crop_ori_temp
+
+    return crop_ori
+
+
+def make_box(center_point, box_x, box_y=None):
+    """ build box for a given center-point"""
+    box_x = int(box_x)
+    if box_y is None:
+        box_y = box_x
+    else:
+        box_y = int(box_y)
+    assert box_x > 0 and box_y > 0
+    center_x, center_y = center_point
+
+    left = int(round(center_x - box_x // 2))
+    right = left + box_x
+    top = int(round(center_y - box_y // 2))
+    bottom = top + box_y
+
+    box = [left, top, right, bottom]
+    return box
+
+
 def timer_vvd(func):
     """
     a timer for func
