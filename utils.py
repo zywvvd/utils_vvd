@@ -24,6 +24,7 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg
 from glob import glob
 
 import numpy as np
+import inspect
 import json
 import time
 import sys
@@ -574,6 +575,12 @@ def time_reduce(*data):
     """
     data = list(data)
     return reduce(lambda x, y: x*y, data)
+
+
+def get_function_name():
+    '''获取正在运行函数(或方法)名称'''
+    # print(sys._getframe().f_code.co_name)
+    return inspect.stack()[1][3]
 
 
 def plt_image_show(*image, window_name='image show', array_res=False, full_screen=False):
