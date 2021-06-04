@@ -654,10 +654,8 @@ def data_show(data):
     '''
     show data in a chart
     '''
-    fig = plt.figure()
-    ax = fig.add_subplot(1, 1, 1)
-    ax.plot(data)
-    fig.show()
+    plt.plot(data)
+    plt.show()
 
 
 def is_path_obj(path):
