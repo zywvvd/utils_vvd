@@ -645,7 +645,7 @@ def get_function_name():
     return inspect.stack()[1][3]
 
 
-def plt_image_show(*image, window_name='image show', array_res=False, full_screen=False):
+def plt_image_show(*image, window_name='image show', array_res=False, full_screen=False, cmap=None):
     '''
     更加鲁棒地显示图像包括二维图像,第三维度为1的图像
     '''
@@ -671,11 +671,12 @@ def plt_image_show(*image, window_name='image show', array_res=False, full_scree
 
         plt.subplot(row_num, col_num, index+1)
         if 'uint8' == image.dtype.__str__():
-            plt.imshow(image, vmax=np.max(image), vmin=np.min(image))
+
+            plt.imshow(image, cmap=cmap, vmax=np.max(image), vmin=np.min(image))
         elif 'int' in image.dtype.__str__():
-            plt.imshow(image, vmax=np.max(image), vmin=np.min(image))
+            plt.imshow(image, cmap=cmap, vmax=np.max(image), vmin=np.min(image))
         else:
-            plt.imshow(image)
+            plt.imshow(image, cmap=cmap)
         plt.title(print_name)
     if not array_res:
         plt.show()
@@ -1052,8 +1053,8 @@ def boxes_painter(rgb_image, box_list, label_list=None, score_list=None, color_l
         text_width, text_height = font.getsize(display_str)
 
         text_bottom = top
-        margin = np.ceil(0.05 * text_height)
 
+        margin = np.ceil(0.05 * text_height)
         draw.rectangle([(left - 1, text_bottom - text_height - 2 * margin), (right + 1, text_bottom)], fill=color)
         if np.mean(np.array(color)) < 250:
             font_color = 'yellow'
