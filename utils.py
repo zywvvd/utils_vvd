@@ -655,7 +655,10 @@ def plt_image_show(*image, window_name='image show', array_res=False, full_scree
     col_num = int(np.ceil(image_num**0.5))
     row_num = int(np.ceil(image_num/col_num))
     if full_screen:
-        plt.figure(figsize=(19.2, 10.8))
+        if current_system() == 'Windows':
+            plt.figure(figsize=(19.2, 10.8))
+        else:
+            plt.figure(figsize=(19.2, 9))
     for index, image_item in enumerate(image_list):
         if isinstance(image_item, tuple):
             assert len(image_item) == 2
