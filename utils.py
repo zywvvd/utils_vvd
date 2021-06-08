@@ -24,6 +24,7 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg
 from glob import glob
 
 import numpy as np
+import inspect
 import json
 import time
 import sys
@@ -64,6 +65,12 @@ def image_formate_transfer(origin_dir, tar_dir, origin_suffix, tar_suffix, recur
         img.save(new_file_name)
 
 
+def get_mac_address():
+    mac=uuid.UUID(int = uuid.getnode()).hex[-12:].upper()
+    #return '%s:%s:%s:%s:%s:%s' % (mac[0:2],mac[2:4],mac[4:6],mac[6:8],mac[8:10],mac[10:])
+    return ":".join([mac[e:e+2] for e in range(0,11,2)])
+
+
 def OS_dir_list(dir_path: str):
     """[文件夹下所有文件夹路径]
 
@@ -80,6 +87,68 @@ def OS_dir_list(dir_path: str):
         if OS_isdir(path):
             path_list.append(path)
     return path_list
+
+
+def crop_data_around_boxes(image, crop_box):
+    """make a image crop from a image safely"""
+
+    ndim = image.ndim
+    height, width = image.shape[:2]
+
+    ori_left, ori_top, ori_right, ori_bottom = 0, 0, width, height
+
+    crop_left, crop_top, crop_right, crop_bottom = crop_box
+
+    assert crop_right > crop_left and crop_bottom > crop_top
+
+    crop_width = crop_right - crop_left
+    crop_height = crop_bottom - crop_top
+
+    cut_left = max(crop_left, ori_left)
+    cut_right = max(min(ori_right, crop_right), cut_left)
+    cut_top = max(ori_top, crop_top)
+    cut_bottom = max(min(ori_bottom, crop_bottom), cut_top)
+
+    crop_ori = image[cut_top:cut_bottom, cut_left:cut_right, ...]
+
+    if cut_right - cut_left != crop_width or cut_bottom - cut_top != crop_height:
+
+        # out of boundary
+        if ndim == 3:
+            crop_ori_temp = np.zeros([crop_height, crop_width, 3], dtype='uint8')
+        elif ndim == 2:
+            crop_ori_temp = np.zeros([crop_height, crop_width], dtype='uint8')
+        else:
+            raise RuntimeError(f"error image shape {image.shape} ndim {ndim}")
+
+        win_left = cut_left - crop_left
+        win_right = max(cut_right - crop_left, win_left)
+        win_top = cut_top - crop_top
+        win_bottom = max(cut_bottom - crop_top, win_top)
+
+        crop_ori_temp[win_top:win_bottom, win_left:win_right, ...] = crop_ori
+        crop_ori = crop_ori_temp
+
+    return crop_ori
+
+
+def make_box(center_point, box_x, box_y=None):
+    """ build box for a given center-point"""
+    box_x = int(box_x)
+    if box_y is None:
+        box_y = box_x
+    else:
+        box_y = int(box_y)
+    assert box_x > 0 and box_y > 0
+    center_x, center_y = center_point
+
+    left = int(round(center_x - box_x // 2))
+    right = left + box_x
+    top = int(round(center_y - box_y // 2))
+    bottom = top + box_y
+
+    box = [left, top, right, bottom]
+    return box
 
 
 def timer_vvd(func):
@@ -570,7 +639,13 @@ def time_reduce(*data):
     return reduce(lambda x, y: x*y, data)
 
 
-def plt_image_show(*image, window_name='image show', array_res=False, full_screen=False):
+def get_function_name():
+    '''获取正在运行函数(或方法)名称'''
+    # print(sys._getframe().f_code.co_name)
+    return inspect.stack()[1][3]
+
+
+def plt_image_show(*image, window_name='image show', array_res=False, full_screen=False, cmap=None):
     '''
     更加鲁棒地显示图像包括二维图像,第三维度为1的图像
     '''
@@ -580,7 +655,10 @@ def plt_image_show(*image, window_name='image show', array_res=False, full_scree
     col_num = int(np.ceil(image_num**0.5))
     row_num = int(np.ceil(image_num/col_num))
     if full_screen:
-        plt.figure(figsize=(19.2, 10.8))
+        if current_system() == 'Windows':
+            plt.figure(figsize=(19.2, 10.8))
+        else:
+            plt.figure(figsize=(19.2, 9))
     for index, image_item in enumerate(image_list):
         if isinstance(image_item, tuple):
             assert len(image_item) == 2
@@ -593,11 +671,12 @@ def plt_image_show(*image, window_name='image show', array_res=False, full_scree
 
         plt.subplot(row_num, col_num, index+1)
         if 'uint8' == image.dtype.__str__():
-            plt.imshow(image, cmap='jet', vmax=np.max(image), vmin=np.min(image))
+
+            plt.imshow(image, cmap=cmap, vmax=np.max(image), vmin=np.min(image))
         elif 'int' in image.dtype.__str__():
-            plt.imshow(image, cmap='jet', vmax=np.max(image), vmin=np.min(image))
+            plt.imshow(image, cmap=cmap, vmax=np.max(image), vmin=np.min(image))
         else:
-            plt.imshow(image)
+            plt.imshow(image, cmap=cmap)
         plt.title(print_name)
     if not array_res:
         plt.show()
@@ -648,10 +727,8 @@ def data_show(data):
     '''
     show data in a chart
     '''
-    fig = plt.figure()
-    ax = fig.add_subplot(1, 1, 1)
-    ax.plot(data)
-    fig.show()
+    plt.plot(data)
+    plt.show()
 
 
 def is_path_obj(path):
@@ -724,7 +801,7 @@ def smart_copy(source_file_path, target_path, verbose=False):
         shutil.copy(source_file_path, target_path)
 
 
-def json_load(json_path):
+def json_load(json_path, verbose=False):
     """
     读取json文件并返回内容字典
     """
@@ -734,13 +811,26 @@ def json_load(json_path):
     try:
         assert OS_exists(json_path)
     except Exception as e:
-        print('file not found !', e)
+        if verbose:
+            print('file not found !', e)
     try:
         with open(json_path, 'r') as fp:
             return json.load(fp)
     except Exception as e:
+        if verbose:
+            print('simple json load failed, try utf-8', e)
+    try:
         with open(json_path, 'r', encoding='utf-8') as fp:
             return json.load(fp)
+    except Exception as e:
+        if verbose:
+            print('utf-8 json load failed, try gbk', e)
+    try:
+        with open(json_path, 'r', encoding='gbk') as fp:
+            return json.load(fp)
+    except Exception as e:
+        if verbose:
+            print('gbk json load failed!', e)        
 
 
 def json_save(json_dict, json_path, overwrite=False, verbose=False):
@@ -894,7 +984,7 @@ def get_gpu_str_as_you_wish(gpu_num_wanted, verbose=0):
     return gpu_index_str, gpu_index_picked_list
 
 
-def boxes_painter(rgb_image, box_list, label_list=None, class_name_dict=None):
+def boxes_painter(rgb_image, box_list, label_list=None, score_list=None, color_list=None):
     """[paint boxex and labels on image]
 
     Args:
@@ -905,16 +995,31 @@ def boxes_painter(rgb_image, box_list, label_list=None, class_name_dict=None):
     Returns:
         [rgb image]: [image with boxes and labels]
     """
-    from PIL import ImageFont, ImageDraw, Image
+    if label_list is not None:
+        assert len(label_list) == len(box_list)
 
-    color = 'LightSkyBlue'
+    if score_list is not None:
+        assert len(score_list) == len(box_list)
+    
+    if color_list is not None:
+        assert len(color_list) == len(box_list)
+
+    from PIL import ImageFont, ImageDraw, Image
+    import matplotlib.font_manager as fm
+
+    color_list_default = [(159, 20, 98), (95, 32, 219), (222, 92, 189), (56, 233, 120), (23, 180, 100), (78, 69, 20), (97, 202, 39), (65, 179, 135), (163, 159, 219)]
     line_thickness = 3
 
     pil_image = Image.fromarray(rgb_image)
     draw = ImageDraw.Draw(pil_image)
 
+    fontsize = 24
+
     try:
-        font = ImageFont.truetype('arial.ttf', 24)
+        if current_system() == 'Windows':
+            font = ImageFont.truetype('arial.ttf', fontsize)
+        else:
+            font = ImageFont.truetype(fm.findfont(fm.FontProperties(family='DejaVu Sans')),fontsize)
     except IOError:
         font = ImageFont.load_default()
 
@@ -924,23 +1029,39 @@ def boxes_painter(rgb_image, box_list, label_list=None, class_name_dict=None):
     for index, bbox in enumerate(box_list):
 
         left, top, right, bottom = np.array(bbox).astype('int').tolist()
-
+        if color_list is not None:
+            color = color_list[index]
+        else:
+            if label_list:
+                color = color_list_default[label_list[index] % len(color_list)]
+            else:
+                color = color[1]
         # draw box
         draw.line([(left, top), (left, bottom), (right, bottom), (right, top), (left, top)], width=line_thickness, fill=color)
 
         # draw text
+        display_str = ""
+
         if label_list:
-            if class_name_dict:
-                display_str = class_name_dict[label_list[index]]
-            else:
-                display_str = str(label_list[index])
-            text_width, text_height = font.getsize(display_str)
+            display_str += str(label_list[index])
+
+        if score_list:
+            if display_str is not "":
+                display_str += ' '
+            score = score_list[index]
+            display_str += str(format(score, '.3f'))
+
+        text_width, text_height = font.getsize(display_str)
 
         text_bottom = top
-        margin = np.ceil(0.05 * text_height)
 
+        margin = np.ceil(0.05 * text_height)
         draw.rectangle([(left - 1, text_bottom - text_height - 2 * margin), (right + 1, text_bottom)], fill=color)
-        draw.text((int(left + (right - left)/2 - text_width/2), text_bottom - text_height - margin), display_str, fill='black', font=font)
+        if np.mean(np.array(color)) < 250:
+            font_color = 'yellow'
+        else:
+            font_color = 'red'
+        draw.text((int(left + (right - left)/2 - text_width/2), text_bottom - text_height - margin), display_str, fill=font_color, font=font)
 
     # get image with box and index
     array_image_with_box = np.asarray(pil_image)

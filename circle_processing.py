@@ -260,6 +260,8 @@ def FitEllipse_RANSAC(pnts, roi=None, max_itts=5, max_refines=3, max_perc_inlier
         Best fitted ellipse parameters ((x0, y0), (a,b), theta)
     '''
 
+    random.seed(7)
+
     # Debug flag
     DEBUG = False
 
@@ -279,6 +281,9 @@ def FitEllipse_RANSAC(pnts, roi=None, max_itts=5, max_refines=3, max_perc_inlier
     n_pnts = pnts.shape[0]
 
     LS_ellipse = cv2.fitEllipse(pnts)
+
+    # return LS_ellipse, []
+
     norm_err = EllipseNormError(pnts, LS_ellipse)
     ok_point_index = np.abs(norm_err) < np.percentile(np.abs(norm_err), 90)
     pnts = pnts[ok_point_index, :]
@@ -292,7 +297,7 @@ def FitEllipse_RANSAC(pnts, roi=None, max_itts=5, max_refines=3, max_perc_inlier
     # Ransac iterations
     for itt in range(0, max_itts):
 
-        # Select 5 points at random
+        # Select points at random
         sample_pnts = np.asarray(random.sample(list(pnts), 30))
 
         # Fit ellipse to points
