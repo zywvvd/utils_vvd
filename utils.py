@@ -798,6 +798,7 @@ def smart_copy(source_file_path, target_path, verbose=False):
         if verbose:
             print("{} already exists!".format(target_path))
     else:
+        dir_check(Path(target_path).parent)
         shutil.copy(source_file_path, target_path)
 
 
