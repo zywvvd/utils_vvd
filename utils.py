@@ -713,6 +713,7 @@ def smart_copy(source_file_path, target_path, verbose=False):
         verbose (bool, optional): [是否显示信息]. Defaults to False.
     """
     source_file_path = str(source_file_path)
+    target_path = str(target_path)
     assert OS_exists(source_file_path)
     if OS_isdir(target_path):
         target_path = OS_join(target_path, OS_basename(source_file_path))
