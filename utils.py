@@ -89,7 +89,7 @@ def OS_dir_list(dir_path: str):
     return path_list
 
 
-def crop_data_around_boxes(image, crop_box):
+def crop_data_around_boxes(image, crop_box, cut_box_back=False):
     """make a image crop from a image safely"""
 
     ndim = image.ndim
@@ -108,6 +108,8 @@ def crop_data_around_boxes(image, crop_box):
     cut_right = max(min(ori_right, crop_right), cut_left)
     cut_top = max(ori_top, crop_top)
     cut_bottom = max(min(ori_bottom, crop_bottom), cut_top)
+
+    cut_box = [cut_left, cut_top, cut_right, cut_bottom]
 
     crop_ori = image[cut_top:cut_bottom, cut_left:cut_right, ...]
 
@@ -129,7 +131,10 @@ def crop_data_around_boxes(image, crop_box):
         crop_ori_temp[win_top:win_bottom, win_left:win_right, ...] = crop_ori
         crop_ori = crop_ori_temp
 
-    return crop_ori
+    if cut_box_back:
+        return crop_ori, cut_box
+    else:
+        return crop_ori
 
 
 def make_box(center_point, box_x, box_y=None):
