@@ -878,6 +878,10 @@ def whether_divisible_by(to_be_divided, dividing):
         return False
 
 
+def vvd_round(num):
+    return int(round(num))
+
+
 def cv_rgb_imwrite(rgb_image, image_save_path):
     """
     [cv2 save a rgb image]
@@ -1006,7 +1010,7 @@ def boxes_painter(rgb_image, box_list, label_list=None, score_list=None, color_l
 
     if score_list is not None:
         assert len(score_list) == len(box_list)
-    
+
     if color_list is not None:
         assert len(color_list) == len(box_list)
 
@@ -1052,7 +1056,7 @@ def boxes_painter(rgb_image, box_list, label_list=None, score_list=None, color_l
             display_str += str(label_list[index])
 
         if score_list:
-            if display_str is not "":
+            if display_str != "":
                 display_str += ' '
             score = score_list[index]
             display_str += str(format(score, '.3f'))
