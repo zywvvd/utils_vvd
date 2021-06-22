@@ -1041,7 +1041,7 @@ def boxes_painter(rgb_image, box_list, label_list=None, score_list=None, color_l
             if label_list:
                 color = color_list_default[label_list[index] % len(color_list)]
             else:
-                color = color[1]
+                color = (255, 255, 0)
         # draw box
         draw.line([(left, top), (left, bottom), (right, bottom), (right, top), (left, top)], width=line_thickness, fill=color)
 
