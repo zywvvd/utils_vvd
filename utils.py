@@ -95,6 +95,8 @@ def crop_data_around_boxes(image, crop_box, cut_box_back=False):
     ndim = image.ndim
     height, width = image.shape[:2]
 
+    crop_box = np.array(crop_box).astype('int32').tolist()
+
     ori_left, ori_top, ori_right, ori_bottom = 0, 0, width, height
 
     crop_left, crop_top, crop_right, crop_bottom = crop_box
