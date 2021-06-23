@@ -685,8 +685,11 @@ def plt_image_show(*image, window_name='image show', array_res=False, full_scree
             plt.imshow(image, cmap=cmap)
         plt.title(print_name)
     if not array_res:
-        mngr = plt.get_current_fig_manager()
-        mngr.window.wm_geometry(f"+{position[0]}+{position[1]}")
+        try:
+            mngr = plt.get_current_fig_manager()
+            mngr.window.wm_geometry(f"+{position[0]}+{position[1]}")
+        except Exception:
+            pass
         plt.show()
     else:
         return convert_plt_to_rgb_image(plt)
