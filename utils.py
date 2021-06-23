@@ -652,7 +652,7 @@ def get_function_name():
     return inspect.stack()[1][3]
 
 
-def plt_image_show(*image, window_name='image show', array_res=False, full_screen=False, cmap=None):
+def plt_image_show(*image, window_name='image show', array_res=False, full_screen=False, cmap=None, position=[30, 30]):
     '''
     更加鲁棒地显示图像包括二维图像,第三维度为1的图像
     '''
@@ -663,9 +663,9 @@ def plt_image_show(*image, window_name='image show', array_res=False, full_scree
     row_num = int(np.ceil(image_num/col_num))
     if full_screen:
         if current_system() == 'Windows':
-            plt.figure(figsize=(19.2, 10.8))
+            plt.figure(figsize=(18.5, 9.4))
         else:
-            plt.figure(figsize=(19.2, 9))
+            plt.figure(figsize=(18.5, 9.4))
     for index, image_item in enumerate(image_list):
         if isinstance(image_item, tuple):
             assert len(image_item) == 2
@@ -678,7 +678,6 @@ def plt_image_show(*image, window_name='image show', array_res=False, full_scree
 
         plt.subplot(row_num, col_num, index+1)
         if 'uint8' == image.dtype.__str__():
-
             plt.imshow(image, cmap=cmap, vmax=np.max(image), vmin=np.min(image))
         elif 'int' in image.dtype.__str__():
             plt.imshow(image, cmap=cmap, vmax=np.max(image), vmin=np.min(image))
@@ -686,6 +685,8 @@ def plt_image_show(*image, window_name='image show', array_res=False, full_scree
             plt.imshow(image, cmap=cmap)
         plt.title(print_name)
     if not array_res:
+        mngr = plt.get_current_fig_manager()
+        mngr.window.wm_geometry(f"+{position[0]}+{position[1]}")
         plt.show()
     else:
         return convert_plt_to_rgb_image(plt)
