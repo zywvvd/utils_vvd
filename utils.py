@@ -13,6 +13,7 @@ from os.path import join as OS_join
 from os.path import exists as OS_exists
 from os.path import isdir as OS_isdir
 from os.path import dirname as OS_dirname
+from numpy.lib.function_base import iterable
 
 from pathlib2 import Path as Path2
 from pathlib import Path
@@ -885,7 +886,21 @@ def whether_divisible_by(to_be_divided, dividing):
 
 
 def vvd_round(num):
+    if iterable(num):
+        return np.round(np.array(num)).astype('int32').tolist()
     return int(round(num))
+
+
+def vvd_ceil(num):
+    if iterable(num):
+        return np.ceil(np.array(num)).astype('int32').tolist()
+    return int(np.ceil(num))
+
+
+def vvd_floor(num):
+    if iterable(num):
+        return np.floor(np.array(num)).astype('int32').tolist()
+    return int(np.floor(num))
 
 
 def cv_rgb_imwrite(rgb_image, image_save_path):
