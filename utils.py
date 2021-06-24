@@ -678,14 +678,19 @@ def plt_image_show(*image, window_name='image show', array_res=False, full_scree
             image = image_item
             print_name = window_name
 
-        if 'uint8' == image.dtype.__str__():
-            ax[index].imshow(image, cmap=cmap, vmax=np.max(image), vmin=np.min(image))
-        elif 'int' in image.dtype.__str__():
-            ax[index](image, cmap=cmap, vmax=np.max(image), vmin=np.min(image))
+        if iterable(ax):
+            cur_ax = ax[index]
         else:
-            ax[index](image, cmap=cmap)
+            cur_ax = ax
 
-        ax[index].set_title(print_name)
+        if 'uint8' == image.dtype.__str__():
+            cur_ax.imshow(image, cmap=cmap, vmax=np.max(image), vmin=np.min(image))
+        elif 'int' in image.dtype.__str__():
+            cur_ax(image, cmap=cmap, vmax=np.max(image), vmin=np.min(image))
+        else:
+            cur_ax(image, cmap=cmap)
+
+        cur_ax.set_title(print_name)
 
     if not array_res:
         try:
