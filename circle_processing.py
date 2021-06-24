@@ -339,4 +339,6 @@ def FitEllipse_RANSAC(pnts, roi=None, max_itts=5, max_refines=3, max_perc_inlier
             if DEBUG: print('Break Max Perc Inliers')
             break
 
+    random.seed()
+
     return best_ellipse, best_inlier_pnts

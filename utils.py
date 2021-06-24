@@ -662,12 +662,15 @@ def plt_image_show(*image, window_name='image show', array_res=False, full_scree
     image_num = len(image_list)
     col_num = int(np.ceil(image_num**0.5))
     row_num = int(np.ceil(image_num/col_num))
+
     if full_screen:
         if current_system() == 'Windows':
             figsize=(18.5, 9.4)
         else:
             figsize=(18.5, 9.4)
+
     _, ax = plt.subplots(row_num, col_num, figsize=figsize, sharex=share_xy, sharey=share_xy)
+
     for index, image_item in enumerate(image_list):
         if isinstance(image_item, tuple) or isinstance(image_item, list):
             assert len(image_item) == 2
