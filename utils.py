@@ -653,7 +653,7 @@ def get_function_name():
     return inspect.stack()[1][3]
 
 
-def plt_image_show(*image, window_name='image show', array_res=False, full_screen=False, cmap=None, position=[30, 30]):
+def plt_image_show(*image, window_name='image show', array_res=False, full_screen=True, cmap=None, position=[30, 30]):
     '''
     更加鲁棒地显示图像包括二维图像,第三维度为1的图像
     '''
