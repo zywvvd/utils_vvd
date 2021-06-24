@@ -653,7 +653,7 @@ def get_function_name():
     return inspect.stack()[1][3]
 
 
-def plt_image_show(*image, window_name='image show', array_res=False, full_screen=True, cmap=None, position=[30, 30]):
+def plt_image_show(*image, window_name='image show', array_res=False, full_screen=True, cmap=None, position=[30, 30], share_xy=False):
     '''
     更加鲁棒地显示图像包括二维图像,第三维度为1的图像
     '''
@@ -664,11 +664,12 @@ def plt_image_show(*image, window_name='image show', array_res=False, full_scree
     row_num = int(np.ceil(image_num/col_num))
     if full_screen:
         if current_system() == 'Windows':
-            plt.figure(figsize=(18.5, 9.4))
+            figsize=(18.5, 9.4)
         else:
-            plt.figure(figsize=(18.5, 9.4))
+            figsize=(18.5, 9.4)
+    _, ax = plt.subplots(row_num, col_num, figsize=figsize, sharex=share_xy, sharey=share_xy)
     for index, image_item in enumerate(image_list):
-        if isinstance(image_item, tuple):
+        if isinstance(image_item, tuple) or isinstance(image_item, list):
             assert len(image_item) == 2
             image = image_item[0]
             current_name = image_item[1]
@@ -677,14 +678,15 @@ def plt_image_show(*image, window_name='image show', array_res=False, full_scree
             image = image_item
             print_name = window_name
 
-        plt.subplot(row_num, col_num, index+1)
         if 'uint8' == image.dtype.__str__():
-            plt.imshow(image, cmap=cmap, vmax=np.max(image), vmin=np.min(image))
+            ax[index].imshow(image, cmap=cmap, vmax=np.max(image), vmin=np.min(image))
         elif 'int' in image.dtype.__str__():
-            plt.imshow(image, cmap=cmap, vmax=np.max(image), vmin=np.min(image))
+            ax[index](image, cmap=cmap, vmax=np.max(image), vmin=np.min(image))
         else:
-            plt.imshow(image, cmap=cmap)
-        plt.title(print_name)
+            ax[index](image, cmap=cmap)
+
+        ax[index].set_title(print_name)
+
     if not array_res:
         try:
             mngr = plt.get_current_fig_manager()
