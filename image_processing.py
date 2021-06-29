@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import cv2
 from numpy.core.fromnumeric import resize
+from numpy.lib.function_base import iterable
 
 
 def show_hist(img):
@@ -20,13 +21,22 @@ def image_resize(img_source, shape=None, factor=None):
     if shape is not None:
         resized_image = cv2.resize(img_source, shape)
 
-    if factor is not None:
-        resized_H = int(round(image_H * factor))
-        resized_W = int(round(image_W * factor))
+    elif factor is not None:
+        if iterable(factor):
+            assert len(factor) == 2
+            factor_x, factor_y = factor
+        else:
+            factor_x, factor_y = factor, factor
+
+        resized_H = int(round(image_H * factor_y))
+        resized_W = int(round(image_W * factor_x))
+
         resized_image = cv2.resize(img_source, [resized_W, resized_H])
 
-    if shape is None and factor is None:
+    elif shape is None and factor is None:
         resized_image = img_source
+    else:
+        raise RuntimeError
 
     pixel_list = np.unique(img_source).tolist()
     if len(pixel_list) == 2 and 0 in pixel_list:
