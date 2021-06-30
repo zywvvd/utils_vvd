@@ -805,7 +805,7 @@ def vvd_image_preprocess(image):
     return new_image
 
 
-def smart_copy(source_file_path, target_path, verbose=False):
+def smart_copy(source_file_path, target_path, verbose=False, remove_source_file=False):
     """[复制文件从源到目标，如果目标已经存在则跳过]]
 
     Args:
@@ -823,7 +823,11 @@ def smart_copy(source_file_path, target_path, verbose=False):
             print("{} already exists!".format(target_path))
     else:
         dir_check(Path(target_path).parent)
-        shutil.copy(source_file_path, target_path)
+        
+        if remove_source_file:
+            shutil.move(source_file_path, target_path)
+        else:
+            shutil.copy(source_file_path, target_path)
 
 
 def json_load(json_path, verbose=False):
