@@ -682,18 +682,29 @@ def plt_image_show(*image, window_name='image show', array_res=False, full_scree
             print_name = window_name
 
         if iterable(ax):
-            cur_ax = ax[index]
+            if ax.ndim == 1:
+                cur_ax = ax[index]
+            elif ax.ndim == 2:
+                row_index = index // col_num
+                col_index = index % col_num
+                cur_ax = ax[row_index][col_index]
+            else:
+                raise RuntimeError(f'bad ax ndim num {ax}')
         else:
             cur_ax = ax
 
-        if 'uint8' == image.dtype.__str__():
-            cur_ax.imshow(image, cmap=cmap, vmax=np.max(image), vmin=np.min(image))
-        elif 'int' in image.dtype.__str__():
-            cur_ax.imshow(image, cmap=cmap, vmax=np.max(image), vmin=np.min(image))
-        elif 'bool' in image.dtype.__str__():
-            cur_ax.imshow(image.astype('uint8'), cmap=cmap, vmax=np.max(image), vmin=np.min(image))
+        if image.ndim == 1:
+            cur_ax.plot(image)
+
         else:
-            cur_ax.imshow(image, cmap=cmap, vmax=np.max(image), vmin=np.min(image))
+            if 'uint8' == image.dtype.__str__():
+                cur_ax.imshow(image, cmap=cmap, vmax=np.max(image), vmin=np.min(image))
+            elif 'int' in image.dtype.__str__():
+                cur_ax.imshow(image, cmap=cmap, vmax=np.max(image), vmin=np.min(image))
+            elif 'bool' in image.dtype.__str__():
+                cur_ax.imshow(image.astype('uint8'), cmap=cmap, vmax=np.max(image), vmin=np.min(image))
+            else:
+                cur_ax.imshow(image, cmap=cmap, vmax=np.max(image), vmin=np.min(image))
 
         cur_ax.set_title(print_name)
 
