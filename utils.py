@@ -703,8 +703,10 @@ def plt_image_show(*image, window_name='image show', array_res=False, full_scree
                 cur_ax.imshow(image, cmap=cmap, vmax=np.max(image), vmin=np.min(image))
             elif 'bool' in image.dtype.__str__():
                 cur_ax.imshow(image.astype('uint8'), cmap=cmap, vmax=np.max(image), vmin=np.min(image))
+            elif 'float' in image.dtype.__str__():
+                cur_ax.imshow(image / max(1, np.max(image)), cmap=cmap)
             else:
-                cur_ax.imshow(image, cmap=cmap, vmax=np.max(image), vmin=np.min(image))
+                cur_ax.imshow(image.astype('uint8'), cmap=cmap, vmax=np.max(image), vmin=np.min(image))
 
         cur_ax.set_title(print_name)
 
