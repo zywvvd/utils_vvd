@@ -71,6 +71,12 @@ def get_mac_address():
     #return '%s:%s:%s:%s:%s:%s' % (mac[0:2],mac[2:4],mac[4:6],mac[6:8],mac[8:10],mac[10:])
     return ":".join([mac[e:e+2] for e in range(0,11,2)])
 
+def get_xyxy(polygon_xy):
+    polygon_array = np.array(polygon_xy)
+    assert polygon_array.shape[0] > 1
+    assert polygon_array.shape[1] == 2
+    x1, y1, x2, y2 = polygon_array[:, 0].min(), polygon_array[:, 1].min(), polygon_array[:, 0].max(), polygon_array[:, 1].max()
+    return [x1, y1, x2, y2]
 
 def OS_dir_list(dir_path: str):
     """[文件夹下所有文件夹路径]
