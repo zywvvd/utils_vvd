@@ -64,7 +64,26 @@ def image_formate_transfer(origin_dir, tar_dir, origin_suffix, tar_suffix, recur
         file_name = Path(image_path).stem
         new_file_name = str(Path(tar_dir) / (file_name + '.' + tar_suffix))
         img.save(new_file_name)
+    
+def crop_by_cycle_y_min_max(image, y_min, y_max):
+    height = image.shape[0]
+    if y_min >= 0 and y_max <= height:
+        crop_image = image[y_min:y_max, :, ...]
+    elif y_min < 0:
+        crop_image = np.vstack((image[y_min % height:, :, ...], image[:y_max, :, ...]))
+    elif y_max > height:
+        crop_image = np.vstack((image[y_min:, :, ...], image[:y_max % height, :, ...]))
+    return crop_image
 
+def crop_by_cycle_x_min_max(image, x_min, x_max):
+    width = image.shape[1]
+    if x_min >= 0 and x_max <= width:
+        crop_image = image[:, x_min:x_max, ...]
+    elif x_min < 0:
+        crop_image = np.hstack((image[:, x_min % width:, ...], image[:, :x_max, ...]))
+    elif x_max > width:
+        crop_image = np.hstack((image[:, x_min:, ...], image[:, :x_max % width, ...]))
+    return crop_image
 
 def get_mac_address():
     mac=uuid.UUID(int = uuid.getnode()).hex[-12:].upper()
