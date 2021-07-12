@@ -94,8 +94,8 @@ def polar_move(polar_image, source_center_phase, target_center_phase):
         target_center_phase ([float]): [target center phase]
     """
     height, width = polar_image.shape[:2]
-    center_index = vvd_round(source_center_phase / 360 * height)
-    target_index = vvd_round(target_center_phase / 360 * height)
+    center_index = vvd_round(source_center_phase % 360 / 360 * height)
+    target_index = vvd_round(target_center_phase % 360 / 360 * height)
 
     new_polar_image = np.zeros_like(polar_image)
 
