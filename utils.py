@@ -85,6 +85,27 @@ def crop_by_cycle_x_min_max(image, x_min, x_max):
         crop_image = np.hstack((image[:, x_min:, ...], image[:, :x_max % width, ...]))
     return crop_image
 
+def polar_move(polar_image, source_center_phase, target_center_phase):
+    """[height of polar_image is the origin circle side]
+
+    Args:
+        polar_image ([np.array]): [polar image]
+        source_center_phase ([float]): [source center phase]
+        target_center_phase ([float]): [target center phase]
+    """
+    height, width = polar_image.shape[:2]
+    center_index = vvd_round(source_center_phase / 360 * height)
+    target_index = vvd_round(target_center_phase / 360 * height)
+
+    new_polar_image = np.zeros_like(polar_image)
+
+    movement = target_index - center_index
+
+    new_polar_image[:movement] = polar_image[-movement:]
+    new_polar_image[movement:] = polar_image[:-movement]
+
+    return new_polar_image
+
 def get_mac_address():
     mac=uuid.UUID(int = uuid.getnode()).hex[-12:].upper()
     #return '%s:%s:%s:%s:%s:%s' % (mac[0:2],mac[2:4],mac[4:6],mac[6:8],mac[8:10],mac[10:])
