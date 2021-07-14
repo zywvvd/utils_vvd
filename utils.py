@@ -67,18 +67,32 @@ def image_formate_transfer(origin_dir, tar_dir, origin_suffix, tar_suffix, recur
     
 def crop_by_cycle_y_min_max(image, y_min, y_max):
     height = image.shape[0]
+
+    if image.ndim > 1:
+        concate_fun = np.vstack
+    else:
+        concate_fun = np.concatenate
+
     if y_min >= 0 and y_max <= height:
-        crop_image = image[y_min:y_max, ...]
+        if y_min <= y_max:
+            crop_image = image[y_min:y_max, ...]
+        else:
+            crop_image = concate_fun((image[y_min:, ...], image[:y_max, ...]))
+
     elif y_min < 0:
-        crop_image = np.vstack((image[y_min % height:, ...], image[:y_max, ...]))
+        crop_image = concate_fun((image[y_min % height:, ...], image[:y_max, ...]))
     elif y_max > height:
-        crop_image = np.vstack((image[y_min:, ...], image[:y_max % height, ...]))
+        crop_image = concate_fun((image[y_min:, ...], image[:y_max % height, ...]))
     return crop_image
 
 def crop_by_cycle_x_min_max(image, x_min, x_max):
     width = image.shape[1]
+    
     if x_min >= 0 and x_max <= width:
-        crop_image = image[:, x_min:x_max, ...]
+        if  x_min <= x_max:
+            crop_image = image[:, x_min:x_max, ...]
+        else:
+            crop_image = np.hstack((image[:, x_min:, ...], image[:, :x_max, ...]))
     elif x_min < 0:
         crop_image = np.hstack((image[:, x_min % width:, ...], image[:, :x_max, ...]))
     elif x_max > width:
