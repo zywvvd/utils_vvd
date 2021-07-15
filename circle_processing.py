@@ -295,10 +295,14 @@ def FitEllipse_RANSAC(pnts, roi=None, max_itts=5, max_refines=3, max_perc_inlier
     best_perc_inliers = 0
     best_inlier_pnts = pnts
     # Ransac iterations
-    for itt in range(0, max_itts):
 
-        # Select points at random
-        sample_pnts = np.asarray(random.sample(list(pnts), 90))
+    sample_num = 90
+    for itt in range(0, max_itts):
+        # Select points
+        if len(pnts) < sample_num:
+            sample_pnts = np.asarray(list(pnts))
+        else:
+            sample_pnts = np.asarray(random.sample(list(pnts), sample_num))
 
         # Fit ellipse to points
         ellipse = cv2.fitEllipse(sample_pnts)
