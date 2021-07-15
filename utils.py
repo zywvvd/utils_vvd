@@ -229,10 +229,19 @@ def timer_vvd(func):
     Outputs:
         time message: a message which tells you how much time the func spent will be printed
     """
-    func_name = func.__name__
+    is_static_method = False
+    try :
+        func_name = func.__name__
+    except Exception as e:
+        func_name = func.__func__.__name__
+        func = func.__func__
+        is_static_method = True
 
     @wraps(func)
     def wrapper(*args, **kwargs):
+        if is_static_method:
+            args = args[1:]
+
         start_time = time.time()
         res = func(*args, **kwargs)
         end_time = time.time()
