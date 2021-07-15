@@ -1104,7 +1104,7 @@ def get_gpu_str_as_you_wish(gpu_num_wanted, verbose=0):
     return gpu_index_str, gpu_index_picked_list
 
 
-def boxes_painter(rgb_image, box_list, label_list=None, score_list=None, color_list=None):
+def boxes_painter(rgb_image, box_list, label_list=None, score_list=None, color_list=None, color=None, line_thickness=3):
     """[paint boxex and labels on image]
 
     Args:
@@ -1115,6 +1115,9 @@ def boxes_painter(rgb_image, box_list, label_list=None, score_list=None, color_l
     Returns:
         [rgb image]: [image with boxes and labels]
     """
+
+    color_input = color
+
     if label_list is not None:
         assert len(label_list) == len(box_list)
 
@@ -1128,7 +1131,6 @@ def boxes_painter(rgb_image, box_list, label_list=None, score_list=None, color_l
     import matplotlib.font_manager as fm
 
     color_list_default = [(159, 20, 98), (95, 32, 219), (222, 92, 189), (56, 233, 120), (23, 180, 100), (78, 69, 20), (97, 202, 39), (65, 179, 135), (163, 159, 219)]
-    line_thickness = 3
 
     pil_image = Image.fromarray(rgb_image)
     draw = ImageDraw.Draw(pil_image)
@@ -1157,6 +1159,9 @@ def boxes_painter(rgb_image, box_list, label_list=None, score_list=None, color_l
             else:
                 color = (255, 255, 0)
         # draw box
+        if color_input:
+             color = tuple(color_input)
+
         draw.line([(left, top), (left, bottom), (right, bottom), (right, top), (left, top)], width=line_thickness, fill=color)
 
         # draw text
