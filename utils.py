@@ -67,18 +67,32 @@ def image_formate_transfer(origin_dir, tar_dir, origin_suffix, tar_suffix, recur
     
 def crop_by_cycle_y_min_max(image, y_min, y_max):
     height = image.shape[0]
+
+    if image.ndim > 1:
+        concate_fun = np.vstack
+    else:
+        concate_fun = np.concatenate
+
     if y_min >= 0 and y_max <= height:
-        crop_image = image[y_min:y_max, ...]
+        if y_min <= y_max:
+            crop_image = image[y_min:y_max, ...]
+        else:
+            crop_image = concate_fun((image[y_min:, ...], image[:y_max, ...]))
+
     elif y_min < 0:
-        crop_image = np.vstack((image[y_min % height:, ...], image[:y_max, ...]))
+        crop_image = concate_fun((image[y_min % height:, ...], image[:y_max, ...]))
     elif y_max > height:
-        crop_image = np.vstack((image[y_min:, ...], image[:y_max % height, ...]))
+        crop_image = concate_fun((image[y_min:, ...], image[:y_max % height, ...]))
     return crop_image
 
 def crop_by_cycle_x_min_max(image, x_min, x_max):
     width = image.shape[1]
+    
     if x_min >= 0 and x_max <= width:
-        crop_image = image[:, x_min:x_max, ...]
+        if  x_min <= x_max:
+            crop_image = image[:, x_min:x_max, ...]
+        else:
+            crop_image = np.hstack((image[:, x_min:, ...], image[:, :x_max, ...]))
     elif x_min < 0:
         crop_image = np.hstack((image[:, x_min % width:, ...], image[:, :x_max, ...]))
     elif x_max > width:
@@ -215,10 +229,19 @@ def timer_vvd(func):
     Outputs:
         time message: a message which tells you how much time the func spent will be printed
     """
-    func_name = func.__name__
+    is_static_method = False
+    try :
+        func_name = func.__name__
+    except Exception as e:
+        func_name = func.__func__.__name__
+        func = func.__func__
+        is_static_method = True
 
     @wraps(func)
     def wrapper(*args, **kwargs):
+        if is_static_method:
+            args = args[1:]
+
         start_time = time.time()
         res = func(*args, **kwargs)
         end_time = time.time()
@@ -1090,7 +1113,7 @@ def get_gpu_str_as_you_wish(gpu_num_wanted, verbose=0):
     return gpu_index_str, gpu_index_picked_list
 
 
-def boxes_painter(rgb_image, box_list, label_list=None, score_list=None, color_list=None):
+def boxes_painter(rgb_image, box_list, label_list=None, score_list=None, color_list=None, color=None, line_thickness=3):
     """[paint boxex and labels on image]
 
     Args:
@@ -1101,6 +1124,9 @@ def boxes_painter(rgb_image, box_list, label_list=None, score_list=None, color_l
     Returns:
         [rgb image]: [image with boxes and labels]
     """
+
+    color_input = color
+
     if label_list is not None:
         assert len(label_list) == len(box_list)
 
@@ -1114,7 +1140,6 @@ def boxes_painter(rgb_image, box_list, label_list=None, score_list=None, color_l
     import matplotlib.font_manager as fm
 
     color_list_default = [(159, 20, 98), (95, 32, 219), (222, 92, 189), (56, 233, 120), (23, 180, 100), (78, 69, 20), (97, 202, 39), (65, 179, 135), (163, 159, 219)]
-    line_thickness = 3
 
     pil_image = Image.fromarray(rgb_image)
     draw = ImageDraw.Draw(pil_image)
@@ -1143,6 +1168,9 @@ def boxes_painter(rgb_image, box_list, label_list=None, score_list=None, color_l
             else:
                 color = (255, 255, 0)
         # draw box
+        if color_input:
+             color = tuple(color_input)
+
         draw.line([(left, top), (left, bottom), (right, bottom), (right, top), (left, top)], width=line_thickness, fill=color)
 
         # draw text

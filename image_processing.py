@@ -16,7 +16,7 @@ def show_hist(img):
     return histogram
 
 
-def image_resize(img_source, shape=None, factor=None):
+def image_resize(img_source, shape=None, factor=None, unique_check=False):
     image_H, image_W = img_source.shape[:2]
     if shape is not None:
         resized_image = cv2.resize(img_source, shape)
@@ -38,8 +38,9 @@ def image_resize(img_source, shape=None, factor=None):
     else:
         raise RuntimeError
 
-    pixel_list = np.unique(img_source).tolist()
-    if len(pixel_list) == 2 and 0 in pixel_list:
-        resized_image[resized_image > 0] = np.max(pixel_list)
+    if unique_check:
+        pixel_list = np.unique(img_source).tolist()
+        if len(pixel_list) == 2 and 0 in pixel_list:
+            resized_image[resized_image > 0] = np.max(pixel_list)
 
     return resized_image
