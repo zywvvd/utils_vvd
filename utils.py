@@ -64,7 +64,8 @@ def image_formate_transfer(origin_dir, tar_dir, origin_suffix, tar_suffix, recur
         file_name = Path(image_path).stem
         new_file_name = str(Path(tar_dir) / (file_name + '.' + tar_suffix))
         img.save(new_file_name)
-    
+
+
 def crop_by_cycle_y_min_max(image, y_min, y_max):
     height = image.shape[0]
 
@@ -85,11 +86,12 @@ def crop_by_cycle_y_min_max(image, y_min, y_max):
         crop_image = concate_fun((image[y_min:, ...], image[:y_max % height, ...]))
     return crop_image
 
+
 def crop_by_cycle_x_min_max(image, x_min, x_max):
     width = image.shape[1]
-    
+
     if x_min >= 0 and x_max <= width:
-        if  x_min <= x_max:
+        if x_min <= x_max:
             crop_image = image[:, x_min:x_max, ...]
         else:
             crop_image = np.hstack((image[:, x_min:, ...], image[:, :x_max, ...]))
@@ -98,6 +100,7 @@ def crop_by_cycle_x_min_max(image, x_min, x_max):
     elif x_max > width:
         crop_image = np.hstack((image[:, x_min:, ...], image[:, :x_max % width, ...]))
     return crop_image
+
 
 def polar_move(polar_image, source_center_phase, target_center_phase):
     """[height of polar_image is the origin circle side]
@@ -120,10 +123,12 @@ def polar_move(polar_image, source_center_phase, target_center_phase):
 
     return new_polar_image
 
+
 def get_mac_address():
-    mac=uuid.UUID(int = uuid.getnode()).hex[-12:].upper()
-    #return '%s:%s:%s:%s:%s:%s' % (mac[0:2],mac[2:4],mac[4:6],mac[6:8],mac[8:10],mac[10:])
-    return ":".join([mac[e:e+2] for e in range(0,11,2)])
+    mac = uuid.UUID(int = uuid.getnode()).hex[-12:].upper()
+    # return '%s:%s:%s:%s:%s:%s' % (mac[0:2],mac[2:4],mac[4:6],mac[6:8],mac[8:10],mac[10:])
+    return ":".join([mac[e: e+2] for e in range(0, 11, 2)])
+
 
 def get_xyxy(polygon_xy):
     polygon_array = np.array(polygon_xy)
@@ -131,6 +136,7 @@ def get_xyxy(polygon_xy):
     assert polygon_array.shape[1] == 2
     x1, y1, x2, y2 = polygon_array[:, 0].min(), polygon_array[:, 1].min(), polygon_array[:, 0].max(), polygon_array[:, 1].max()
     return [x1, y1, x2, y2]
+
 
 def OS_dir_list(dir_path: str):
     """[文件夹下所有文件夹路径]
@@ -148,6 +154,18 @@ def OS_dir_list(dir_path: str):
         if OS_isdir(path):
             path_list.append(path)
     return path_list
+
+
+def get_file_size_M(file_path):
+    """[get file size]
+
+    Args:
+        file_path ([str/Path]): [path to file]
+
+    Returns:
+        [float]: [size of file by M]
+    """
+    return os.path.getsize(str(file_path)) / 1024 / 1024
 
 
 def crop_data_around_boxes(image, crop_box, cut_box_back=False):
