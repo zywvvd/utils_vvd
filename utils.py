@@ -521,8 +521,8 @@ class MyEncoder(json.JSONEncoder):
             return float(obj)
         elif isinstance(obj, np.ndarray):
             return obj.tolist()
-        if isinstance(obj, time):
-            return obj.__str__()
+        if isinstance(obj, np.bool_):
+            return bool(obj)
         else:
             return super(MyEncoder, self).default(obj)
 
