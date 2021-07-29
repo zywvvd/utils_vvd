@@ -722,7 +722,7 @@ def image_show(image, window_name='image show'):
     cv_image_show(image=temp_image, window_name=window_name)
 
 
-def image_read(image_path, channel=-1):
+def image_read(image_path, channel=3):
     """
     读取图像，可包含中文路径
     Args:
