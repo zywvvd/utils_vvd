@@ -66,6 +66,24 @@ def image_formate_transfer(origin_dir, tar_dir, origin_suffix, tar_suffix, recur
         img.save(new_file_name)
 
 
+def get_list_from_list(data_list, call_back):
+    """[make a list through a input list,
+    while the output list will collect the output of a function dealing with every item of the input list]
+
+    Args:
+        data_list ([list]): [original input list]
+        call_back ([function]): [a call back function to do sth with every item of input list]
+
+    Returns:
+        output_list[list]: [collection of output of call_back function]
+    """
+    output_list = list()
+    assert isinstance(data_list, list)
+    for data in data_list:
+        output_list.append(call_back(data))
+    return output_list
+
+
 def crop_by_cycle_y_min_max(image, y_min, y_max):
     height = image.shape[0]
 
@@ -85,13 +103,6 @@ def crop_by_cycle_y_min_max(image, y_min, y_max):
     elif y_max > height:
         crop_image = concate_fun((image[y_min:, ...], image[:y_max % height, ...]))
     return crop_image
-
-
-def get_list_from_list(data_list, call_back):
-    output_list = list()
-    for data in data_list:
-        output_list.append(call_back(data))
-    return output_list
 
 
 def crop_by_cycle_x_min_max(image, x_min, x_max):
@@ -935,7 +946,7 @@ def smart_copy(source_file_path, target_path, verbose=False, remove_source_file=
             print("{} already exists!".format(target_path))
     else:
         dir_check(Path(target_path).parent)
-        
+
         if remove_source_file:
             shutil.move(source_file_path, target_path)
         else:
@@ -1199,7 +1210,7 @@ def boxes_painter(rgb_image, box_list, label_list=None, score_list=None, color_l
                 color = (255, 255, 0)
         # draw box
         if color_input:
-             color = tuple(color_input)
+            color = tuple(color_input)
 
         draw.line([(left, top), (left, bottom), (right, bottom), (right, top), (left, top)], width=line_thickness, fill=color)
 
@@ -1231,6 +1242,31 @@ def boxes_painter(rgb_image, box_list, label_list=None, score_list=None, color_l
     array_image_with_box = np.asarray(pil_image)
 
     return array_image_with_box
+
+
+def get_dir_file_list(root_path):
+    """[get dir and file list under root_path recursively]
+
+    Args:
+        root_path ([str]): [root dir to querry]
+
+    Returns:
+        dir_list [list]: [output dir list]
+        file_list [list]: [output file list]
+    """
+
+    dir_list = list()
+    file_list = list()
+
+    root_path = str(root_path)
+
+    for root, dirs, files in os.walk(root_path):
+        file_list += get_list_from_list(files, lambda x: os.path.join(root, x))
+        for dir in dirs:
+            cur_dir_path = os.path.join(root, dir)
+            dir_list.append(cur_dir_path)
+
+    return dir_list, file_list
 
 
 if __name__ == '__main__':
