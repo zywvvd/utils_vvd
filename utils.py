@@ -87,6 +87,13 @@ def crop_by_cycle_y_min_max(image, y_min, y_max):
     return crop_image
 
 
+def get_list_from_list(data_list, call_back):
+    output_list = list()
+    for data in data_list:
+        output_list.append(call_back(data))
+    return output_list
+
+
 def crop_by_cycle_x_min_max(image, x_min, x_max):
     width = image.shape[1]
 
@@ -844,6 +851,11 @@ def draw_RB_map(y_true, y_pred, map_save_path=None):
     plt.figure(figsize=(25, 3))
     plt.hist(y_pred, bins=255)
     plt.title('ng_score distribution')
+    plt.show()
+
+
+def histgrom(data, bin_num=100):
+    plt.hist(data, bin_num)
     plt.show()
 
 
