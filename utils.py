@@ -71,13 +71,15 @@ def get_list_from_list(data_list, call_back, absolutely=False):
     while the output list will collect the output of a function dealing with every item of the input list]
 
     Args:
-        data_list ([list]): [original input list]
+        data_list ([list/np.ndarray]): [original input list]
         call_back ([function]): [a call back function to do sth with every item of input list]
         absolutely([bool]): add result of call_back function to output_list whatever it is
     Returns:
         output_list[list]: [collection of output of call_back function]
     """
     output_list = list()
+    if isinstance(data_list, np.ndarray):
+        data_list = data_list.tolist()
     assert isinstance(data_list, list)
     for data in data_list:
         res = call_back(data)
