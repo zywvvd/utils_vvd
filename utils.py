@@ -66,21 +66,23 @@ def image_formate_transfer(origin_dir, tar_dir, origin_suffix, tar_suffix, recur
         img.save(new_file_name)
 
 
-def get_list_from_list(data_list, call_back):
+def get_list_from_list(data_list, call_back, absolutely=False):
     """[make a list through a input list,
     while the output list will collect the output of a function dealing with every item of the input list]
 
     Args:
         data_list ([list]): [original input list]
         call_back ([function]): [a call back function to do sth with every item of input list]
-
+        absolutely([bool]): add result of call_back function to output_list whatever it is
     Returns:
         output_list[list]: [collection of output of call_back function]
     """
     output_list = list()
     assert isinstance(data_list, list)
     for data in data_list:
-        output_list.append(call_back(data))
+        res = call_back(data)
+        if res is not None or absolutely:
+            output_list.append(res)
     return output_list
 
 
