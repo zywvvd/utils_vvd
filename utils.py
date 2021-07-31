@@ -259,6 +259,18 @@ def make_box(center_point, box_x, box_y=None):
     return box
 
 
+def unify_data_to_python_type(data):
+    """[transfer numpy data to python type]
+
+    Args:
+        data ([dict/list]): [data to transfer]
+
+    Returns:
+        [type of input data]: [numpy data will be transfered to python type]
+    """
+    return json.loads(json.dumps(data, cls=MyEncoder))
+
+
 def timer_vvd(func):
     """
     a timer for func
