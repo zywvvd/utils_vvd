@@ -1,7 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import cv2
-from numpy.core.fromnumeric import resize
 from numpy.lib.function_base import iterable
 
 
@@ -44,3 +43,30 @@ def image_resize(img_source, shape=None, factor=None, unique_check=False):
             resized_image[resized_image > 0] = np.max(pixel_list)
 
     return resized_image
+
+
+def img_normalize(img, mean, std, to_rgb=False):
+    """Inplace normalize an image with mean and std.
+
+    Args:
+        img (ndarray): Image to be normalized.
+        mean (ndarray): The mean to be used for normalize.
+        std (ndarray): The std to be used for normalize.
+        to_rgb (bool): Whether to convert to rgb.
+
+    Returns:
+        ndarray: The normalized image.
+    """
+    # cv2 inplace normalization does not accept uint8
+    img = img.astype('float32')
+
+    mean = np.array(mean, dtype='float32')
+    std = np.array(std, dtype='float32')
+
+    mean = np.float64(mean.reshape(1, -1))
+    stdinv = 1 / np.float64(std.reshape(1, -1))
+    if to_rgb:
+        cv2.cvtColor(img, cv2.COLOR_BGR2RGB, img)  # inplace
+    cv2.subtract(img, mean, img)  # inplace
+    cv2.multiply(img, stdinv, img)  # inplace
+    return img

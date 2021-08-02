@@ -26,3 +26,19 @@ def to_tensor(data):
         return torch.FloatTensor([data])
     else:
         raise TypeError(f'type {type(data)} cannot be converted to tensor.')
+
+
+def image_to_tensor(img):
+    """Convert image to :obj:`torch.Tensor`.
+
+    The dimension order of input image is (H, W, C). The pipeline will convert
+    it to (C, H, W). If only 2 dimension (H, W) is given, the output would be
+    (1, H, W).
+
+    """
+
+    if len(img.shape) < 3:
+        img = np.expand_dims(img, -1)
+    result = to_tensor(img.transpose(2, 0, 1))
+    result = result.contiguous()
+    return result
