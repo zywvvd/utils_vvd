@@ -1071,6 +1071,19 @@ def cv_rgb_imwrite(rgb_image, image_save_path):
     cv.imwrite(str(image_save_path), bgr_image)
 
 
+def pil_rgb_imwrite(rgb_image, image_save_path):
+    """
+    [pil save a rgb image]
+    Args:
+        rgb_image ([np.array]): [rgb image]
+        image_save_path ([str/Path]): [image save path]
+    """
+    pil_image = Image.fromarray(rgb_image)
+    image_save_path = Path(image_save_path)
+    image_save_path.parent.mkdir(parents=True, exist_ok=True)
+    pil_image.save(str(image_save_path))
+
+
 def image_show_from_path(file_path):
     """[show image from image file path]
 
@@ -1260,11 +1273,12 @@ def boxes_painter(rgb_image, box_list, label_list=None, score_list=None, color_l
     return array_image_with_box
 
 
-def get_dir_file_list(root_path):
+def get_dir_file_list(root_path, recursive=False):
     """[get dir and file list under root_path recursively]
 
     Args:
         root_path ([str]): [root dir to querry]
+        recursive ([bool]): [whether walk recursively]
 
     Returns:
         dir_list [list]: [output dir list]
@@ -1278,9 +1292,13 @@ def get_dir_file_list(root_path):
 
     for root, dirs, files in os.walk(root_path):
         file_list += get_list_from_list(files, lambda x: os.path.join(root, x))
+
         for dir in dirs:
             cur_dir_path = os.path.join(root, dir)
             dir_list.append(cur_dir_path)
+
+        if not recursive:
+            break
 
     return dir_list, file_list
 
