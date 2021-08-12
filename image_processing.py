@@ -70,3 +70,57 @@ def img_normalize(img, mean, std, to_rgb=False):
     cv2.subtract(img, mean, img)  # inplace
     cv2.multiply(img, stdinv, img)  # inplace
     return img
+
+
+def img_rotate(img,
+             angle,
+             center=None,
+             interpolation=cv2.INTER_LINEAR,
+             border_mode=cv2.BORDER_CONSTANT,
+             border_value=0,
+             auto_bound=False,
+             ):
+    """Rotate an image.
+
+    Args:
+        img (ndarray): Image to be rotated.
+        angle (float): Rotation angle in degrees, positive values mean
+            clockwise rotation.
+        center (tuple[float], optional): Center point (w, h) of the rotation in
+            the source image. If not specified, the center of the image will be
+            used.
+        border_value (int): Border value.
+        auto_bound (bool): Whether to adjust the image size to cover the whole
+            rotated image.
+
+    Returns:
+        ndarray: The rotated image.
+    """
+    type = img.dtype
+    img = img.astype('uint8')
+    scale=1.0
+    if center is not None and auto_bound:
+        raise ValueError('`auto_bound` conflicts with `center`')
+    h, w = img.shape[:2]
+    if center is None:
+        center = ((w - 1) * 0.5, (h - 1) * 0.5)
+    assert isinstance(center, tuple)
+
+    matrix = cv2.getRotationMatrix2D(center, -angle, scale)
+    if auto_bound:
+        cos = np.abs(matrix[0, 0])
+        sin = np.abs(matrix[0, 1])
+        new_w = h * sin + w * cos
+        new_h = h * cos + w * sin
+        matrix[0, 2] += (new_w - w) * 0.5
+        matrix[1, 2] += (new_h - h) * 0.5
+        w = int(np.round(new_w))
+        h = int(np.round(new_h))
+    rotated = cv2.warpAffine(
+        img,
+        matrix, (w, h),
+        flags=interpolation,
+        borderValue=border_value,
+        borderMode=border_mode)
+    rotated.astype(type)
+    return rotated
