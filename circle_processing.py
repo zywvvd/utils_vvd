@@ -239,7 +239,7 @@ def OverlayRANSACFit(img, all_pnts, inlier_pnts, ellipse):
     cv2.ellipse(img, ellipse, (0, 255, 255), 1)
 
 
-def FitEllipse_RANSAC(pnts, roi=None, max_itts=5, max_refines=3, max_perc_inliers=95.0, graphics=False):
+def FitEllipse_RANSAC(pnts, roi=None, max_itts=5, max_refines=3, max_perc_inliers=95.0, graphics=False, random_state=None):
     '''
     Robust ellipse fitting to segmented boundary points
     Parameters
@@ -260,7 +260,14 @@ def FitEllipse_RANSAC(pnts, roi=None, max_itts=5, max_refines=3, max_perc_inlier
         Best fitted ellipse parameters ((x0, y0), (a,b), theta)
     '''
 
-    random.seed(7)
+    # save random state
+    cur_state_save = random.getstate()
+
+    # set specific random state
+    if random_state is not None:
+        random.setstate(random_state)
+    else:
+        random.seed(7)
 
     # Debug flag
     DEBUG = False
@@ -343,6 +350,7 @@ def FitEllipse_RANSAC(pnts, roi=None, max_itts=5, max_refines=3, max_perc_inlier
             if DEBUG: print('Break Max Perc Inliers')
             break
 
-    random.seed()
+    # recover random state
+    random.setstate(cur_state_save)
 
     return best_ellipse, best_inlier_pnts
