@@ -881,8 +881,10 @@ def draw_RB_map(y_true, y_pred, map_save_path=None):
     plt.show()
 
 
-def histgrom(data, bin_num=100):
-    plt.hist(data, bin_num)
+def histgrom(*data, bin_num=100):
+    data_list = list(data)
+    for data_item in data_list:
+        plt.hist(data_item, bin_num)
     plt.show()
 
 
