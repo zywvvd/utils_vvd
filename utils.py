@@ -20,7 +20,6 @@ from pathlib import Path
 import PIL.Image as Image
 
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_agg import FigureCanvasAgg
 
 from glob import glob
 
@@ -42,28 +41,6 @@ from tqdm import tqdm
 
 from functools import wraps
 from functools import reduce
-
-popular_image_suffixes = ['png', 'jpg', 'jpeg', 'bmp']
-
-
-def image_formate_transfer(origin_dir, tar_dir, origin_suffix, tar_suffix, recursively=False):
-
-    if origin_suffix.lower() not in popular_image_suffixes:
-        raise Warning(f'origin_suffix {origin_suffix} is not an usually image file suffix')
-
-    if tar_suffix.lower() not in popular_image_suffixes:
-        raise Warning(f'tar_suffix {tar_suffix} is not an usually image file suffix')
-
-    assert Path(origin_dir).is_dir(), f"origin_dir {origin_dir} does not exist"
-    assert Path(tar_dir).is_dir(), f"origin_dir {tar_dir} does not exist"
-
-    image_path_list = glob_recursively(origin_dir, origin_suffix, recursively=recursively)
-
-    for image_path in tqdm(image_path_list, desc=f"converting suffix from {origin_suffix} to {tar_suffix}"):
-        img = Image.open(image_path)
-        file_name = Path(image_path).stem
-        new_file_name = str(Path(tar_dir) / (file_name + '.' + tar_suffix))
-        img.save(new_file_name)
 
 
 def get_list_from_list(data_list, call_back, absolutely=False):
@@ -88,76 +65,10 @@ def get_list_from_list(data_list, call_back, absolutely=False):
     return output_list
 
 
-def crop_by_cycle_y_min_max(image, y_min, y_max):
-    height = image.shape[0]
-
-    if image.ndim > 1:
-        concate_fun = np.vstack
-    else:
-        concate_fun = np.concatenate
-
-    if y_min >= 0 and y_max <= height:
-        if y_min <= y_max:
-            crop_image = image[y_min:y_max, ...]
-        else:
-            crop_image = concate_fun((image[y_min:, ...], image[:y_max, ...]))
-
-    elif y_min < 0:
-        crop_image = concate_fun((image[y_min % height:, ...], image[:y_max, ...]))
-    elif y_max > height:
-        crop_image = concate_fun((image[y_min:, ...], image[:y_max % height, ...]))
-    return crop_image
-
-
-def crop_by_cycle_x_min_max(image, x_min, x_max):
-    width = image.shape[1]
-
-    if x_min >= 0 and x_max <= width:
-        if x_min <= x_max:
-            crop_image = image[:, x_min:x_max, ...]
-        else:
-            crop_image = np.hstack((image[:, x_min:, ...], image[:, :x_max, ...]))
-    elif x_min < 0:
-        crop_image = np.hstack((image[:, x_min % width:, ...], image[:, :x_max, ...]))
-    elif x_max > width:
-        crop_image = np.hstack((image[:, x_min:, ...], image[:, :x_max % width, ...]))
-    return crop_image
-
-
-def polar_move(polar_image, source_center_phase, target_center_phase):
-    """[height of polar_image is the origin circle side]
-
-    Args:
-        polar_image ([np.array]): [polar image]
-        source_center_phase ([float]): [source center phase]
-        target_center_phase ([float]): [target center phase]
-    """
-    height, width = polar_image.shape[:2]
-    center_index = vvd_round(source_center_phase % 360 / 360 * height)
-    target_index = vvd_round(target_center_phase % 360 / 360 * height)
-
-    new_polar_image = np.zeros_like(polar_image)
-
-    movement = target_index - center_index
-
-    new_polar_image[:movement] = polar_image[-movement:]
-    new_polar_image[movement:] = polar_image[:-movement]
-
-    return new_polar_image
-
-
 def get_mac_address():
     mac = uuid.UUID(int = uuid.getnode()).hex[-12:].upper()
     # return '%s:%s:%s:%s:%s:%s' % (mac[0:2],mac[2:4],mac[4:6],mac[6:8],mac[8:10],mac[10:])
     return ":".join([mac[e: e+2] for e in range(0, 11, 2)])
-
-
-def get_xyxy(polygon_xy):
-    polygon_array = np.array(polygon_xy)
-    assert polygon_array.shape[0] > 1
-    assert polygon_array.shape[1] == 2
-    x1, y1, x2, y2 = polygon_array[:, 0].min(), polygon_array[:, 1].min(), polygon_array[:, 0].max(), polygon_array[:, 1].max()
-    return [x1, y1, x2, y2]
 
 
 def OS_dir_list(dir_path: str):
@@ -188,75 +99,6 @@ def get_file_size_M(file_path):
         [float]: [size of file by M]
     """
     return os.path.getsize(str(file_path)) / 1024 / 1024
-
-
-def crop_data_around_boxes(image, crop_box, cut_box_back=False):
-    """make a image crop from a image safely"""
-
-    ndim = image.ndim
-    height, width = image.shape[:2]
-
-    crop_box = np.array(crop_box).astype('int32').tolist()
-
-    ori_left, ori_top, ori_right, ori_bottom = 0, 0, width, height
-
-    crop_left, crop_top, crop_right, crop_bottom = crop_box
-
-    assert crop_right > crop_left and crop_bottom > crop_top
-
-    crop_width = crop_right - crop_left
-    crop_height = crop_bottom - crop_top
-
-    cut_left = max(crop_left, ori_left)
-    cut_right = max(min(ori_right, crop_right), cut_left)
-    cut_top = max(ori_top, crop_top)
-    cut_bottom = max(min(ori_bottom, crop_bottom), cut_top)
-
-    cut_box = [cut_left, cut_top, cut_right, cut_bottom]
-
-    crop_ori = image[cut_top:cut_bottom, cut_left:cut_right, ...]
-
-    if cut_right - cut_left != crop_width or cut_bottom - cut_top != crop_height:
-
-        # out of boundary
-        if ndim == 3:
-            crop_ori_temp = np.zeros([crop_height, crop_width, 3], dtype='uint8')
-        elif ndim == 2:
-            crop_ori_temp = np.zeros([crop_height, crop_width], dtype='uint8')
-        else:
-            raise RuntimeError(f"error image shape {image.shape} ndim {ndim}")
-
-        win_left = cut_left - crop_left
-        win_right = max(cut_right - crop_left, win_left)
-        win_top = cut_top - crop_top
-        win_bottom = max(cut_bottom - crop_top, win_top)
-
-        crop_ori_temp[win_top:win_bottom, win_left:win_right, ...] = crop_ori
-        crop_ori = crop_ori_temp
-
-    if cut_box_back:
-        return crop_ori, cut_box
-    else:
-        return crop_ori
-
-
-def make_box(center_point, box_x, box_y=None):
-    """ build box for a given center-point"""
-    box_x = int(box_x)
-    if box_y is None:
-        box_y = box_x
-    else:
-        box_y = int(box_y)
-    assert box_x > 0 and box_y > 0
-    center_x, center_y = center_point
-
-    left = int(round(center_x - box_x // 2))
-    right = left + box_x
-    top = int(round(center_y - box_y // 2))
-    bottom = top + box_y
-
-    box = [left, top, right, bottom]
-    return box
 
 
 def unify_data_to_python_type(data):
@@ -480,66 +322,6 @@ def get_file_hash_code(file):
     return digest
 
 
-def zero_padding(in_array, padding_size_1, padding_size_2, padding_size_3=None, padding_size_4=None):
-    """
-    四周补零，以此避免边界判断(仅用于三通道图像)
-
-    输入：
-    :in_array: 输入矩阵 np.array (rows, cols, 3)
-
-    (padding_size_3-4 为 None 时)
-    :padding_size_1:  上下补零行数
-    :padding_size_2:  左右补零列数
-
-    (padding_size_3-4 均不为 None 时)
-    :padding_size_1:  上补零行数
-    :padding_size_2:  下补零行数
-    :padding_size_3:  左补零列数
-    :padding_size_4:  右补零列数
-
-    输出：
-    :padded_array: 补零后的图像（新建矩阵，不修改原始输入）
-    """
-
-    assert np.ndim(in_array) == 3 or np.ndim(in_array) == 2
-
-    if np.ndim(in_array) == 3:
-        rows, cols, ndim = in_array.shape
-    else:
-        rows, cols = in_array.shape
-
-    if (padding_size_3 is None) and (padding_size_4 is None):
-        padding_size_1 = max(padding_size_1, 0)
-        padding_size_2 = max(padding_size_2, 0)
-        assert padding_size_1 >= 0 and padding_size_2 >= 0
-        if np.ndim(in_array) == 3:
-            padded_array = np.zeros([rows + 2 * padding_size_1, cols + 2 * padding_size_2, ndim], dtype=type(in_array[0][0][0]))
-            padded_array[padding_size_1:rows + padding_size_1, padding_size_2:cols + padding_size_2, :] = in_array
-        elif np.ndim(in_array) == 2:
-            padded_array = np.zeros([rows + 2 * padding_size_1, cols + 2 * padding_size_2], dtype=type(in_array[0][0]))
-            padded_array[padding_size_1:rows + padding_size_1, padding_size_2:cols + padding_size_2] = in_array
-        else:
-            raise ValueError("np.ndim error")
-
-    else:
-        assert (padding_size_3 is not None) and (padding_size_4 is not None), "padding_size_3 padding_size_4 必须都不是none"
-        padding_size_1 = max(padding_size_1, 0)
-        padding_size_2 = max(padding_size_2, 0)
-        padding_size_3 = max(padding_size_3, 0)
-        padding_size_4 = max(padding_size_4, 0)
-        assert padding_size_1 >= 0 and padding_size_2 >= 0 and padding_size_3 >= 0 and padding_size_4 >= 0
-        if np.ndim(in_array) == 3:
-            padded_array = np.zeros([rows + padding_size_1 + padding_size_2, cols + padding_size_3 + padding_size_4, ndim], dtype=type(in_array[0][0][0]))
-            padded_array[padding_size_1:rows + padding_size_1, padding_size_3:cols + padding_size_3, :] = in_array
-        elif np.ndim(in_array) == 2:
-            padded_array = np.zeros([rows + padding_size_1 + padding_size_2, cols + padding_size_3 + padding_size_4], dtype=type(in_array[0][0]))
-            padded_array[padding_size_1:rows + padding_size_1, padding_size_3:cols + padding_size_3] = in_array
-        else:
-            raise ValueError("np.ndim error")
-
-    return padded_array
-
-
 class MyEncoder(json.JSONEncoder):
     """
     自定义序列化方法，解决 TypeError - Object of type xxx is not JSON serializable 错误
@@ -690,76 +472,6 @@ def dir_check(dir_path, verbose=False):
         return True
 
 
-def cv_image_show(image, window_name='image show'):
-    '''
-    show image (for debug)
-    press anykey to destory the window 
-
-    image: image in numpy 
-    window_name: name of the window
-
-    image color - bgr
-    '''
-    cv.namedWindow(window_name, cv.WINDOW_NORMAL)
-    cv.imshow(window_name, image)
-    cv.waitKey(0)
-    cv.destroyAllWindows()
-
-
-def extend_image_channel(input_image):
-    '''
-    cv显示三通道图像，本函数将原始图像扩展到三通道
-    '''
-    image = input_image.copy()
-
-    shape = image.shape
-
-    max_value = np.max(image)
-    if not is_integer(max_value) and max_value > 1:
-        image /= np.max(image)
-
-    if 0 < np.max(image) <= 1:
-        image = (255*image).astype('uint8')
-
-
-    if len(shape) == 3:
-        if shape[2] == 3:
-            return image
-        elif shape[2] == 1:
-            temp_image = np.zeros([shape[0], shape[1], 3])
-            for i in range(3):
-                temp_image[:, :, i] = image[:, :, 0]
-            return temp_image
-        else:
-            raise TypeError('image type error')
-    elif len(shape) == 2:
-        temp_image = np.zeros([shape[0], shape[1], 3], dtype=type(image[0][0]))
-        for i in range(3):
-            temp_image[:, :, i] = image
-        return temp_image
-    else:
-        raise TypeError('image type error')
-
-
-def image_show(image, window_name='image show'):
-    '''
-    更加鲁棒地显示图像包括二维图像,第三维度为1的图像
-    '''
-    temp_image = extend_image_channel(image)
-    cv_image_show(image=temp_image, window_name=window_name)
-
-
-def image_read(image_path, channel=3):
-    """
-    读取图像，可包含中文路径
-    Args:
-        image_path ([str]): [图像路径]
-        channel (int, optional): [图像通道数，-1为默认，0为灰度]. Defaults to -1.
-    """
-    image_path = str(image_path)
-    return cv.imdecode(np.fromfile(image_path, dtype=np.uint8), channel)
-
-
 def time_reduce(*data):
     """
     [计算输入数据的乘积]
@@ -772,88 +484,6 @@ def get_function_name():
     '''获取正在运行函数(或方法)名称'''
     # print(sys._getframe().f_code.co_name)
     return inspect.stack()[1][3]
-
-
-def plt_image_show(*image, window_name='image show', array_res=False, full_screen=True, cmap=None, position=[30, 30], share_xy=False):
-    '''
-    更加鲁棒地显示图像包括二维图像,第三维度为1的图像
-    '''
-    image_list = list(image)
-    # temp_image = extend_image_channel(image)
-    image_num = len(image_list)
-    col_num = int(np.ceil(image_num**0.5))
-    row_num = int(np.ceil(image_num/col_num))
-
-    if full_screen:
-        if current_system() == 'Windows':
-            figsize=(18.5, 9.4)
-        else:
-            figsize=(18.5, 9.4)
-
-    _, ax = plt.subplots(row_num, col_num, figsize=figsize, sharex=share_xy, sharey=share_xy)
-
-    for index, image_item in enumerate(image_list):
-        if isinstance(image_item, tuple) or isinstance(image_item, list):
-            assert len(image_item) == 2
-            image = image_item[0]
-            current_name = image_item[1]
-            print_name = current_name
-        else:
-            image = image_item
-            print_name = window_name
-
-        if iterable(ax):
-            if ax.ndim == 1:
-                cur_ax = ax[index]
-            elif ax.ndim == 2:
-                row_index = index // col_num
-                col_index = index % col_num
-                cur_ax = ax[row_index][col_index]
-            else:
-                raise RuntimeError(f'bad ax ndim num {ax}')
-        else:
-            cur_ax = ax
-
-        if image.ndim == 1:
-            cur_ax.plot(image)
-
-        else:
-            if 'uint8' == image.dtype.__str__():
-                cur_ax.imshow(image, cmap=cmap, vmax=np.max(image), vmin=np.min(image))
-            elif 'int' in image.dtype.__str__():
-                cur_ax.imshow(image, cmap=cmap, vmax=np.max(image), vmin=np.min(image))
-            elif 'bool' in image.dtype.__str__():
-                cur_ax.imshow(image.astype('uint8'), cmap=cmap, vmax=np.max(image), vmin=np.min(image))
-            elif 'float' in image.dtype.__str__():
-                cur_ax.imshow((image - np.min(image)) / (max(1, np.max(image)) - np.min(image)), cmap=cmap)
-            else:
-                cur_ax.imshow(image.astype('uint8'), cmap=cmap, vmax=np.max(image), vmin=np.min(image))
-
-        cur_ax.set_title(print_name)
-
-    if not array_res:
-        try:
-            mngr = plt.get_current_fig_manager()
-            mngr.window.wm_geometry(f"+{position[0]}+{position[1]}")
-        except Exception:
-            pass
-        plt.show()
-    else:
-        return convert_plt_to_rgb_image(plt)
-
-
-def convert_plt_to_rgb_image(plt):
-    # Convert a Matplotlib figure to a 3D numpy array with RGB channels and return it
-    canvas = FigureCanvasAgg(plt.gcf())
-    canvas.draw()
-    w, h = canvas.get_width_height()
-    buf = np.fromstring(canvas.tostring_argb(), dtype=np.uint8)
-    buf.shape = (w, h, 4)
-    buf = np.roll(buf, 3, axis=2)
-    image = Image.frombytes("RGBA", (w, h), buf.tostring())
-    image = np.asarray(image)
-    rgb_image = image[:, :, :3]
-    return rgb_image
 
 
 def draw_RB_map(y_true, y_pred, map_save_path=None):
@@ -903,47 +533,12 @@ def is_path_obj(path):
         return False
 
 
-def cv_rgb_imread(image_path):
-    """
-    按照RGB顺序使用cv读取图像
-    """
-    image_path = str(image_path)
-    image = image_read(image_path)
-    b, g, r = cv.split(image)
-    image = cv.merge([r, g, b])
-
-    return image
-
-
-def cv_rgb_bgr_convert(image):
-    """[convert rgb to bgr or bgr ro rgb]
-
-    Args:
-        image ([np.array(uint8)]): [uint8 image]
-
-    Returns:
-        [image]: [r and b swapped]
-    """
-    b, g, r = cv.split(image)
-    image = cv.merge([r, g, b])
-
-    return image
-
-
 def time_stamp():
     """
     返回当前时间戳字符串
     格式: 年-月-日_时-分-秒
     """
     return time.strftime("%Y-%m-%d_%H-%M-%S", time.localtime())
-
-
-def vvd_image_preprocess(image):
-    """
-    vvd 图像预处理
-    """
-    new_image = image / 127.5 - 1
-    return new_image
 
 
 def smart_copy(source_file_path, target_path, verbose=False, remove_source_file=False):
@@ -1028,7 +623,21 @@ def is_integer(num):
     """
     是否是整数，返回bool结果
     """
-    return isinstance(num, (int, np.int, np.int32, np.uint8))
+    return isinstance(num, (int, np.int, np.int32, np.uint8, np.int16, np.int64))
+
+
+def is_float(num):
+    """
+    是否是浮点数，返回bool结果
+    """
+    return isinstance(num, (float, np.floating))
+
+
+def is_number(num):
+    """
+    是否是数字，返回bool结果
+    """
+    return is_float(num) or is_integer(num)
 
 
 def whether_divisible_by(to_be_divided, dividing):
@@ -1058,47 +667,6 @@ def vvd_floor(num):
     if iterable(num):
         return np.floor(np.array(num)).astype('int32').tolist()
     return int(np.floor(num))
-
-
-def cv_rgb_imwrite(rgb_image, image_save_path):
-    """
-    [cv2 save a rgb image]
-    Args:
-        rgb_image ([np.array]): [rgb image]
-        image_save_path ([str/Path]): [image save path]
-    """
-    bgr_image = cv.cvtColor(rgb_image, cv.COLOR_RGB2BGR)
-    image_save_path = Path(image_save_path)
-    image_save_path.parent.mkdir(parents=True, exist_ok=True)
-    cv.imwrite(str(image_save_path), bgr_image)
-
-
-def pil_rgb_imwrite(rgb_image, image_save_path):
-    """
-    [pil save a rgb image]
-    Args:
-        rgb_image ([np.array]): [rgb image]
-        image_save_path ([str/Path]): [image save path]
-    """
-    pil_image = Image.fromarray(rgb_image)
-    image_save_path = Path(image_save_path)
-    image_save_path.parent.mkdir(parents=True, exist_ok=True)
-    pil_image.save(str(image_save_path))
-
-
-def image_show_from_path(file_path):
-    """[show image from image file path]
-
-    Args:
-        file_path ([str or Path]): [path of image file]
-    """
-    assert is_path_obj(file_path) or isinstance(file_path, str)
-    file_path = str(file_path)
-    if not OS_exists(file_path):
-        print('file: ', file_path, 'does not exist.')
-    else:
-        image = cv_rgb_imread(file_path)
-        plt_image_show(image)
 
 
 def erode(mat, iterations=1, kernel_size=3):
@@ -1183,103 +751,6 @@ def get_gpu_str_as_you_wish(gpu_num_wanted, verbose=0):
     pynvml.nvmlShutdown()
 
     return gpu_index_str, gpu_index_picked_list
-
-
-def boxes_painter(rgb_image, box_list, label_list=None, score_list=None, color_list=None, color=None, class_name_dict=None, line_thickness=3):
-    """[paint boxex and labels on image]
-
-    Args:
-        rgb_image ([np.array(uint8)]): [np array image as type uint8]
-        box_list ([list of list of 4 int]): [list of box like [10(xmin), 20(ymin), 50(xmax), 60(ymax)]]
-        label_list ([list of int]): [class indexes of boxes in box_list] (could be none)
-        class_name_dict ([dict - index: class_name]): [key is index and value is the name in type of str] (could be none)
-    Returns:
-        [rgb image]: [image with boxes and labels]
-    """
-
-    color_input = color
-
-    if label_list is not None:
-        assert len(label_list) == len(box_list)
-        if class_name_dict is not None:
-            for item in label_list:
-                assert item in class_name_dict
-
-    if score_list is not None:
-        assert len(score_list) == len(box_list)
-
-    if color_list is not None:
-        assert len(color_list) == len(box_list)
-
-    from PIL import ImageFont, ImageDraw, Image
-    import matplotlib.font_manager as fm
-
-    color_list_default = [(159, 2, 98), (95, 32, 219), (222, 92, 189), (56, 233, 120), (23, 180, 100), (78, 69, 20), (97, 202, 39), (65, 179, 135), (163, 159, 219)]
-
-    pil_image = Image.fromarray(rgb_image)
-    draw = ImageDraw.Draw(pil_image)
-
-    fontsize = 24
-
-    try:
-        if current_system() == 'Windows':
-            font = ImageFont.truetype('arial.ttf', fontsize)
-        else:
-            font = ImageFont.truetype(fm.findfont(fm.FontProperties(family='DejaVu Sans')),fontsize)
-    except IOError:
-        font = ImageFont.load_default()
-
-    text_height = 22
-
-    # draw boxes
-    for index, bbox in enumerate(box_list):
-
-        left, top, right, bottom = np.array(bbox).astype('int').tolist()
-        if color_list is not None:
-            color = color_list[index]
-        else:
-            if label_list:
-                color = color_list_default[label_list[index] % len(color_list_default)]
-            else:
-                color = (255, 255, 0)
-
-        # draw box
-        if color_input:
-            color = tuple(color_input)
-
-        draw.line([(left, top), (left, bottom), (right, bottom), (right, top), (left, top)], width=line_thickness, fill=color)
-
-        # draw text
-        display_str = ""
-
-        if label_list:
-            if class_name_dict:
-                display_str += class_name_dict[label_list[index]]
-            else:
-                display_str += str(label_list[index])
-
-        if score_list:
-            if display_str != "":
-                display_str += ' '
-            score = score_list[index]
-            display_str += str(format(score, '.3f'))
-
-        text_width, text_height = font.getsize(display_str)
-
-        text_bottom = top
-
-        margin = np.ceil(0.05 * text_height)
-        draw.rectangle([(left - 1, text_bottom - text_height - 2 * margin), (right + 1, text_bottom)], fill=color)
-        if np.mean(np.array(color)) < 250:
-            font_color = 'yellow'
-        else:
-            font_color = 'red'
-        draw.text((int(left + (right - left)/2 - text_width/2), text_bottom - text_height - margin), display_str, fill=font_color, font=font)
-
-    # get image with box and index
-    array_image_with_box = np.asarray(pil_image)
-
-    return array_image_with_box
 
 
 def get_dir_file_list(root_path, recursive=False):
