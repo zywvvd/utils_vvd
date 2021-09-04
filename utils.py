@@ -293,12 +293,12 @@ def get_current_dir():
     return os.path.dirname(os.path.realpath(__file__))
 
 
-def file_read_lines(file_path):
+def file_read_lines(file_path, encoding='utf8'):
     if not OS_exists(file_path):
         print("file {} not found, None will be return".format(file_path))
         return None
 
-    with open(file_path, "r") as f:
+    with open(file_path, "r", encoding=encoding) as f:
         lines = f.readlines()
         for index, line in enumerate(lines):
             lines[index] = line.strip('\n')
@@ -308,7 +308,7 @@ def file_read_lines(file_path):
 def file_write_lines(line_list, file_path, overwrite=False, verbose=False):
     dir_check(OS_dirname(file_path))
     file_path = save_file_path_check(file_path, overwrite, verbose)
-    with open(file_path, 'w') as f:
+    with open(file_path, 'w', encoding='utf8') as f:
         f.writelines('\n'.join(line_list))
 
 
