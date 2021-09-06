@@ -93,6 +93,11 @@ def boxes_painter(rgb_image, box_list, label_list=None, score_list=None, color_l
         [rgb image]: [image with boxes and labels]
     """
 
+    if rgb_image.ndim == 2:
+        rgb_image = (np.repeat(rgb_image[:, :, None], 3, axis=2))
+
+    rgb_image = rgb_image.astype('uint8')
+
     color_input = color
 
     if label_list is not None:
