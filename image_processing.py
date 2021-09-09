@@ -574,10 +574,13 @@ def fill_sector(image, center, radius_out, radius_in, start_radian, end_radian, 
     Returns:
         [np.array]: [output image]
     """
+    image = image.copy()
     mask = np.zeros_like(image)
     start_angle = start_radian / np.pi * 360
     end_angle = end_radian / np.pi * 360
     mask = cv2.ellipse(mask, vvd_round(center), vvd_round([radius_out, radius_out]), 0, start_angle, end_angle, color, -1)
     mask = cv2.ellipse(mask, vvd_round(center), vvd_round([radius_in, radius_in]), 0, start_angle, end_angle, [0] * 3, -1)
     mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, np.ones([3,3]))
-    return mask
+
+    image[mask > 0] = mask[mask > 0]
+    return image
