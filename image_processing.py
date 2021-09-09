@@ -558,3 +558,26 @@ def crop_by_cycle_x_min_max(image, x_min, x_max):
         crop_image = np.hstack((image[:, x_min:, ...], image[:, :x_max % width, ...]))
     return crop_image
 
+
+def fill_sector(image, center, radius_out, radius_in, start_radian, end_radian, color=[255, 255, 255]):
+    """[fill sector]
+
+    Args:
+        image ([np.array]): [input image]
+        center ([list]): [center X Y]
+        radius_out ([number]): [outside radius]
+        radius_in ([number]): [inside radius]
+        start_radian ([float]): [start radian]
+        end_radian ([float]): [end radian]
+        color (list, optional): [fill color]. Defaults to [255, 255, 255].
+
+    Returns:
+        [np.array]: [output image]
+    """
+    mask = np.zeros_like(image)
+    start_angle = start_radian / np.pi * 360
+    end_angle = end_radian / np.pi * 360
+    mask = cv2.ellipse(mask, vvd_round(center), vvd_round([radius_out, radius_out]), 0, start_angle, end_angle, color, -1)
+    mask = cv2.ellipse(mask, vvd_round(center), vvd_round([radius_in, radius_in]), 0, start_angle, end_angle, [0] * 3, -1)
+    mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, np.ones([3,3]))
+    return mask

@@ -65,6 +65,12 @@ def get_list_from_list(data_list, call_back, absolutely=False):
     return output_list
 
 
+def segment_intersection(seg_1, seg_2):
+    assert len(seg_1) == len(seg_2) == 2
+    inter_dis = max(0, min(max(seg_1), max(seg_2)) - max(min(seg_1), min(seg_2)))
+    return inter_dis
+
+
 def get_mac_address():
     mac = uuid.UUID(int = uuid.getnode()).hex[-12:].upper()
     # return '%s:%s:%s:%s:%s:%s' % (mac[0:2],mac[2:4],mac[4:6],mac[6:8],mac[8:10],mac[10:])
