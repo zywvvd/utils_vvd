@@ -57,11 +57,18 @@ def get_list_from_list(data_list, call_back, absolutely=False):
     output_list = list()
     if isinstance(data_list, np.ndarray):
         data_list = data_list.tolist()
-    assert isinstance(data_list, list)
-    for data in data_list:
-        res = call_back(data)
-        if res is not None or absolutely:
-            output_list.append(res)
+    if isinstance(data_list, list):
+        for data in data_list:
+            res = call_back(data)
+            if res is not None or absolutely:
+                output_list.append(res)
+    elif isinstance(data_list, dict):
+        for key, data in data_list.items():
+            res = call_back(data)
+            if res is not None or absolutely:
+                output_list.append(res)
+    else:
+        raise RuntimeError('input should be list or dict')
     return output_list
 
 
