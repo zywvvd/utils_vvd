@@ -321,6 +321,8 @@ def plt_image_show(*image, window_name='image show', array_res=False, full_scree
         else:
             cur_ax = ax
 
+        cur_ax.axis('off')
+
         if image.ndim == 1:
             cur_ax.plot(image)
 
