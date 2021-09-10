@@ -593,5 +593,5 @@ def local_normalization(image, k_size=5):
     gauss_square_image = cv2.GaussianBlur(square_image, (k_size, k_size), 0)
     sigma_image = gauss_square_image ** 0.5
     res_image = reduce_mean_image / (sigma_image + 1e-6)
-    plt_image_show(res_image)
-    pass
+
+    return res_image
