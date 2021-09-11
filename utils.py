@@ -796,6 +796,24 @@ def get_dir_file_list(root_path, recursive=False):
     return dir_list, file_list
 
 
+def get_segments(data):
+    """
+    get segments for data (for moved safe data)
+    """
+    assert data.ndim == 1
+    data = (data > 0).astype('int8')
+    mark = data[:-1] - data[1:]
+    start_pos = np.nonzero(mark == -1)[0].tolist()
+    end_pos = np.nonzero(mark == 1)[0].tolist()
+    if data[0] > 0:
+        start_pos = [-1] + start_pos
+    if data[-1] > 0:
+        end_pos = end_pos + [len(mark)]
+    assert len(start_pos) == len(end_pos)
+    segments_list = [[x + 1, y] for x, y in zip(start_pos, end_pos)]
+    return segments_list
+
+
 if __name__ == '__main__':
     test_name = 'abc/sadf/gsdf.sadf.test'
     strong_printing(test_name)
