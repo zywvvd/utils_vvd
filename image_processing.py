@@ -321,6 +321,8 @@ def plt_image_show(*image, window_name='image show', array_res=False, full_scree
         else:
             cur_ax = ax
 
+        cur_ax.axis('off')
+
         if image.ndim == 1:
             cur_ax.plot(image)
 
@@ -584,3 +586,14 @@ def fill_sector(image, center, radius_out, radius_in, start_radian, end_radian, 
 
     image[mask > 0] = mask[mask > 0]
     return image
+
+
+def local_normalization(image, k_size=5):
+    gauss_image = cv2.GaussianBlur(image, (k_size, k_size), 0)
+    reduce_mean_image = image - gauss_image.astype('float')
+    square_image = (reduce_mean_image ** 2)
+    gauss_square_image = cv2.GaussianBlur(square_image, (k_size, k_size), 0)
+    sigma_image = gauss_square_image ** 0.5
+    res_image = reduce_mean_image / (sigma_image + 1e-6)
+
+    return res_image
