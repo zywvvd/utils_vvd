@@ -142,14 +142,18 @@ def img_rotate(img,
     return rotated
 
 
-def cv_rgb_imread(image_path):
+def cv_rgb_imread(image_path, gray=False):
     """
     按照RGB顺序使用cv读取图像
     """
     image_path = str(image_path)
     image = image_read(image_path)
-    b, g, r = cv.split(image)
-    image = cv.merge([r, g, b])
+    if gray:
+        if image.ndim > 2:
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    else:
+        b, g, r = cv.split(image)
+        image = cv.merge([r, g, b])
 
     return image
 
