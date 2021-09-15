@@ -64,11 +64,23 @@ def image_resize(img_source, shape=None, factor=None, unique_check=False):
 
 
 def to_gray_image(image):
+    """
+    transfer a 3 channel image to  a 2 channels one
+    """
     if image.ndim > 2:
         gray_image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
     else:
         gray_image = image
     return gray_image
+
+
+def to_colorful_image(image):
+    """
+    make a gray image to an image with 3 channels
+    """
+    if image.ndim == 2:
+        image = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
+    return image
 
 
 def img_normalize(img, mean, std, to_rgb=False):
