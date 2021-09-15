@@ -2,6 +2,8 @@ import cv2
 import cv2 as cv
 import numpy as np
 import PIL.Image as Image
+
+import matplotlib
 import matplotlib.pyplot as plt
 
 from .utils import vvd_round
@@ -59,6 +61,14 @@ def image_resize(img_source, shape=None, factor=None, unique_check=False):
             resized_image[resized_image > 0] = np.max(pixel_list)
 
     return resized_image
+
+
+def to_gray_image(image):
+    if image.ndim > 2:
+        gray_image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+    else:
+        gray_image = image
+    return gray_image
 
 
 def img_normalize(img, mean, std, to_rgb=False):
@@ -142,14 +152,18 @@ def img_rotate(img,
     return rotated
 
 
-def cv_rgb_imread(image_path):
+def cv_rgb_imread(image_path, gray=False):
     """
     按照RGB顺序使用cv读取图像
     """
     image_path = str(image_path)
     image = image_read(image_path)
-    b, g, r = cv.split(image)
-    image = cv.merge([r, g, b])
+    if gray:
+        if image.ndim > 2:
+            image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    else:
+        b, g, r = cv.split(image)
+        image = cv.merge([r, g, b])
 
     return image
 
@@ -240,17 +254,20 @@ def extend_image_channel(input_image):
 
 
 
-def cv_rgb_imwrite(rgb_image, image_save_path):
+def cv_rgb_imwrite(rgb_image, image_save_path, bgr=False):
     """
     [cv2 save a rgb image]
     Args:
         rgb_image ([np.array]): [rgb image]
         image_save_path ([str/Path]): [image save path]
     """
-    bgr_image = cv.cvtColor(rgb_image, cv.COLOR_RGB2BGR)
+    if not bgr:
+        image = cv.cvtColor(rgb_image, cv.COLOR_RGB2BGR)
+    else:
+        image = rgb_image
     image_save_path = Path(image_save_path)
     image_save_path.parent.mkdir(parents=True, exist_ok=True)
-    cv.imwrite(str(image_save_path), bgr_image)
+    cv.imwrite(str(image_save_path), image, [cv2.IMWRITE_JPEG_QUALITY, 50])
 
 
 def pil_rgb_imwrite(rgb_image, image_save_path):
@@ -297,8 +314,13 @@ def plt_image_show(*image, window_name='image show', array_res=False, full_scree
         else:
             figsize=(18.5, 9.4)
 
-    _, ax = plt.subplots(row_num, col_num, figsize=figsize, sharex=share_xy, sharey=share_xy)
+    fig, ax = plt.subplots(row_num, col_num, figsize=figsize, sharex=share_xy, sharey=share_xy)
 
+    backend = matplotlib.get_backend()
+
+    plt.subplots_adjust(top=1, bottom=0, left=0, right=1, hspace=0.05, wspace=0.05)
+    plt.gca().xaxis.set_major_locator(plt.NullLocator())
+    plt.gca().yaxis.set_major_locator(plt.NullLocator())
     for index, image_item in enumerate(image_list):
         if isinstance(image_item, tuple) or isinstance(image_item, list):
             assert len(image_item) == 2
@@ -320,7 +342,7 @@ def plt_image_show(*image, window_name='image show', array_res=False, full_scree
                 raise RuntimeError(f'bad ax ndim num {ax}')
         else:
             cur_ax = ax
-
+        
         cur_ax.axis('off')
 
         if image.ndim == 1:
@@ -338,6 +360,7 @@ def plt_image_show(*image, window_name='image show', array_res=False, full_scree
             else:
                 cur_ax.imshow(image.astype('uint8'), cmap=cmap, vmax=np.max(image), vmin=np.min(image))
 
+        cur_ax.margins(0, 0)
         cur_ax.set_title(print_name)
 
     if not array_res:
