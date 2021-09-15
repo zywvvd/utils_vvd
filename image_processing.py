@@ -61,6 +61,14 @@ def image_resize(img_source, shape=None, factor=None, unique_check=False):
     return resized_image
 
 
+def to_gray_image(image):
+    if image.ndim > 2:
+        gray_image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+    else:
+        gray_image = image
+    return gray_image
+
+
 def img_normalize(img, mean, std, to_rgb=False):
     """Inplace normalize an image with mean and std.
 
