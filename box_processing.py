@@ -134,7 +134,8 @@ def boxes_painter(rgb_image, box_list, label_list=None, score_list=None, color_l
 
     # draw boxes
     for index, bbox in enumerate(box_list):
-
+        if not bbox:
+            continue
         left, top, right, bottom = np.array(bbox).astype('int').tolist()
         if color_list is not None:
             color = color_list[index]
