@@ -2,6 +2,8 @@ import cv2
 import cv2 as cv
 import numpy as np
 import PIL.Image as Image
+
+import matplotlib
 import matplotlib.pyplot as plt
 
 from .utils import vvd_round
@@ -301,8 +303,13 @@ def plt_image_show(*image, window_name='image show', array_res=False, full_scree
         else:
             figsize=(18.5, 9.4)
 
-    _, ax = plt.subplots(row_num, col_num, figsize=figsize, sharex=share_xy, sharey=share_xy)
+    fig, ax = plt.subplots(row_num, col_num, figsize=figsize, sharex=share_xy, sharey=share_xy)
 
+    backend = matplotlib.get_backend()
+
+    plt.subplots_adjust(top=1, bottom=0, left=0, right=1, hspace=0.05, wspace=0.05)
+    plt.gca().xaxis.set_major_locator(plt.NullLocator())
+    plt.gca().yaxis.set_major_locator(plt.NullLocator())
     for index, image_item in enumerate(image_list):
         if isinstance(image_item, tuple) or isinstance(image_item, list):
             assert len(image_item) == 2
@@ -324,7 +331,7 @@ def plt_image_show(*image, window_name='image show', array_res=False, full_scree
                 raise RuntimeError(f'bad ax ndim num {ax}')
         else:
             cur_ax = ax
-
+        
         cur_ax.axis('off')
 
         if image.ndim == 1:
@@ -342,6 +349,7 @@ def plt_image_show(*image, window_name='image show', array_res=False, full_scree
             else:
                 cur_ax.imshow(image.astype('uint8'), cmap=cmap, vmax=np.max(image), vmin=np.min(image))
 
+        cur_ax.margins(0, 0)
         cur_ax.set_title(print_name)
 
     if not array_res:
