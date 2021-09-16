@@ -64,11 +64,23 @@ def image_resize(img_source, shape=None, factor=None, unique_check=False):
 
 
 def to_gray_image(image):
+    """
+    transfer a 3 channel image to  a 2 channels one
+    """
     if image.ndim > 2:
         gray_image = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
     else:
         gray_image = image
     return gray_image
+
+
+def to_colorful_image(image):
+    """
+    make a gray image to an image with 3 channels
+    """
+    if image.ndim == 2:
+        image = cv2.cvtColor(image, cv2.COLOR_GRAY2RGB)
+    return image
 
 
 def img_normalize(img, mean, std, to_rgb=False):
@@ -254,7 +266,7 @@ def extend_image_channel(input_image):
 
 
 
-def cv_rgb_imwrite(rgb_image, image_save_path, bgr=False):
+def cv_rgb_imwrite(rgb_image, image_save_path, bgr=False, para=None):
     """
     [cv2 save a rgb image]
     Args:
@@ -267,7 +279,18 @@ def cv_rgb_imwrite(rgb_image, image_save_path, bgr=False):
         image = rgb_image
     image_save_path = Path(image_save_path)
     image_save_path.parent.mkdir(parents=True, exist_ok=True)
-    cv.imwrite(str(image_save_path), image, [cv2.IMWRITE_JPEG_QUALITY, 50])
+
+    suffix = image_save_path.suffix.lower()
+    quality_para = None
+    if para is not None:
+        if suffix == '.jpg' or suffix == '.jpeg':
+            # para in 0-100, the bigger the image quality higher and the file size larger
+            quality_para = [cv2.IMWRITE_JPEG_QUALITY, para]
+        elif suffix == '.png':
+            # para in 0-9, the bigger the image file size smaller
+            quality_para = [cv2.IMWRITE_PNG_COMPRESSION, para]
+
+    cv.imwrite(str(image_save_path), image, quality_para)
 
 
 def pil_rgb_imwrite(rgb_image, image_save_path):
