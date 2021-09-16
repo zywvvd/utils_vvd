@@ -266,7 +266,7 @@ def extend_image_channel(input_image):
 
 
 
-def cv_rgb_imwrite(rgb_image, image_save_path, bgr=False):
+def cv_rgb_imwrite(rgb_image, image_save_path, bgr=False, para=None):
     """
     [cv2 save a rgb image]
     Args:
@@ -279,7 +279,18 @@ def cv_rgb_imwrite(rgb_image, image_save_path, bgr=False):
         image = rgb_image
     image_save_path = Path(image_save_path)
     image_save_path.parent.mkdir(parents=True, exist_ok=True)
-    cv.imwrite(str(image_save_path), image, [cv2.IMWRITE_JPEG_QUALITY, 50])
+
+    suffix = image_save_path.suffix.lower()
+    quality_para = None
+    if para is not None:
+        if suffix == '.jpg' or suffix == '.jpeg':
+            # para in 0-100, the bigger the image quality higher and the file size larger
+            quality_para = [cv2.IMWRITE_JPEG_QUALITY, para]
+        elif suffix == '.png':
+            # para in 0-9, the bigger the image file size smaller
+            quality_para = [cv2.IMWRITE_PNG_COMPRESSION, para]
+
+    cv.imwrite(str(image_save_path), image, quality_para)
 
 
 def pil_rgb_imwrite(rgb_image, image_save_path):
