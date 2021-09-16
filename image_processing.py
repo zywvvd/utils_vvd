@@ -321,7 +321,7 @@ def image_show_from_path(file_path):
         plt_image_show(image)
 
 
-def plt_image_show(*image, window_name='image show', array_res=False, full_screen=True, cmap=None, position=[30, 30], share_xy=False):
+def plt_image_show(*image, window_name='image show', array_res=False, full_screen=True, cmap=None, position=[30, 30], share_xy=False, axis_off=False):
     '''
     更加鲁棒地显示图像包括二维图像,第三维度为1的图像
     '''
@@ -341,9 +341,8 @@ def plt_image_show(*image, window_name='image show', array_res=False, full_scree
 
     backend = matplotlib.get_backend()
 
-    plt.subplots_adjust(top=1, bottom=0, left=0, right=1, hspace=0.05, wspace=0.05)
-    plt.gca().xaxis.set_major_locator(plt.NullLocator())
-    plt.gca().yaxis.set_major_locator(plt.NullLocator())
+    plt.subplots_adjust(top=0.93, bottom=0.05, left=0.05, right=0.95, hspace=0.05, wspace=0.05)
+
     for index, image_item in enumerate(image_list):
         if isinstance(image_item, tuple) or isinstance(image_item, list):
             assert len(image_item) == 2
@@ -365,8 +364,8 @@ def plt_image_show(*image, window_name='image show', array_res=False, full_scree
                 raise RuntimeError(f'bad ax ndim num {ax}')
         else:
             cur_ax = ax
-        
-        cur_ax.axis('off')
+        if axis_off:
+            cur_ax.axis('off')
 
         if image.ndim == 1:
             cur_ax.plot(image)
