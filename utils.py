@@ -817,21 +817,20 @@ def get_segments(data):
 
 def try_exc_else(try_func, except_func, else_func=None, developer_mode=False):
     except_result = try_results = else_result = None
-    crashed = False
+
     if developer_mode:
         try_results = try_func()
     else:
         try:
             try_results = try_func()
         except Exception as e:
-            crashed = True
             except_result = except_func(e)
-            return crashed, try_results, except_result, else_result
+            return True, try_results, except_result, else_result
 
     if else_func is not None:
         else_result = else_func(try_results)
 
-    return crashed, try_results, except_result, else_result
+    return False, try_results, except_result, else_result
 
 
 if __name__ == '__main__':
