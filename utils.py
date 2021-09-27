@@ -815,30 +815,27 @@ def get_segments(data):
     return segments_list
 
 
-def try_exc_else(try_func, exc_func, else_func=None, developer_mode=False):
-    except_result = try_results = else_result = None
+def try_exc_else(try_func, exc_func, developer_mode=False):
+    except_result = try_result = None
 
     if developer_mode:
-        try_results = try_func()
+        try_result = try_func()
     else:
         try:
-            try_results = try_func()
+            try_result = try_func()
         except Exception as e:
             ori_exception_info = list(e.args)
             if len(ori_exception_info) == 0:
                 ori_exception_info.append('')
-            ori_exception_info[0] = 'error message: ' + str(ori_exception_info[0])\
-                + '\ncrashfile: ' + str(e.__traceback__.tb_next.tb_frame.f_globals['__file__'])\
-                + '\nline: ' + str(e.__traceback__.tb_next.tb_lineno)
+            ori_exception_info[0] = ' Error message: ' + str(ori_exception_info[0])\
+                + '\n Crashfile: ' + str(e.__traceback__.tb_next.tb_frame.f_globals['__file__'])\
+                + '\n Line: ' + str(e.__traceback__.tb_next.tb_lineno)
 
             e.args = tuple(ori_exception_info)
             except_result = exc_func(e)
-            return True, try_results, except_result, else_result
+            return except_result
 
-    if else_func is not None:
-        else_result = else_func(try_results)
-
-    return False, try_results, except_result, else_result
+    return try_result
 
 
 if __name__ == '__main__':
