@@ -826,7 +826,7 @@ def try_exc_else(try_func, except_func, else_func=None, developer_mode=False):
         except Exception as e:
             crashed = True
             except_result = except_func(e)
-            return try_results, except_result, else_result
+            return crashed, try_results, except_result, else_result
 
     if else_func is not None:
         else_result = else_func(try_results)
