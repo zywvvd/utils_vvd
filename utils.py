@@ -824,15 +824,21 @@ def try_exc_handler(try_func, exc_func, developer_mode=False):
         try:
             try_result = try_func()
         except Exception as e:
-            ori_exception_info = list(e.args)
-            if len(ori_exception_info) == 0:
-                ori_exception_info.append('')
-            ori_exception_info[0] = ' Error message: ' + str(ori_exception_info[0])\
-                + '\n Crashfile: ' + str(e.__traceback__.tb_next.tb_frame.f_globals['__file__'])\
-                + '\n Line: ' + str(e.__traceback__.tb_next.tb_lineno)
+            try:
+                ori_exception_info = list(e.args)
+                if len(ori_exception_info) == 0:
+                    ori_exception_info.append('')
+                ori_exception_info[0] = ' ErrorMessage: ' + str(ori_exception_info[0])\
+                    + '\n CrashFile: ' + str(e.__traceback__.tb_next.tb_frame.f_globals['__file__'])\
+                    + '\n Line: ' + str(e.__traceback__.tb_next.tb_lineno)
 
-            e.args = tuple(ori_exception_info)
-            except_result = exc_func(e)
+                e.args = tuple(ori_exception_info)
+                except_result = exc_func(e)
+            except Exception as ee:
+                print("!! exc_func failed.")
+                print(f"!! error message: {str(ee)}")
+                print("!! we can only return the previous exception info.")
+                except_result = str(e)
             return except_result
 
     return try_result
