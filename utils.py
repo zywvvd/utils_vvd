@@ -824,6 +824,15 @@ def try_exc_else(try_func, except_func, else_func=None, developer_mode=False):
         try:
             try_results = try_func()
         except Exception as e:
+            ori_exception_info = list(e.args)
+            if len(ori_exception_info) == 0:
+                ori_exception_info.append('')
+            ori_exception_info[0] = 'error message: ' + str(ori_exception_info[0])\
+                + '\ncrashfile: ' + str(e.__traceback__.tb_next.tb_frame.f_globals['__file__'])\
+                + '\nfunc name: ' + e.__traceback__.tb_next.tb_frame.f_locals['fn_name']\
+                + '\nline: ' + str(e.__traceback__.tb_next.tb_lineno)
+
+            e.args = tuple(ori_exception_info)
             except_result = except_func(e)
             return True, try_results, except_result, else_result
 
