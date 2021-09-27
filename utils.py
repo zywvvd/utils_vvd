@@ -815,7 +815,7 @@ def get_segments(data):
     return segments_list
 
 
-def (try_func, exc_func, developer_mode=False):
+def try_exc_handler(try_func, exc_func, developer_mode=False):
     except_result = try_result = None
 
     if developer_mode:
