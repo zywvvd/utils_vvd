@@ -815,7 +815,7 @@ def get_segments(data):
     return segments_list
 
 
-def try_exc_else(try_func, except_func, else_func=None, developer_mode=False):
+def try_exc_else(try_func, exc_func, else_func=None, developer_mode=False):
     except_result = try_results = else_result = None
 
     if developer_mode:
@@ -829,11 +829,10 @@ def try_exc_else(try_func, except_func, else_func=None, developer_mode=False):
                 ori_exception_info.append('')
             ori_exception_info[0] = 'error message: ' + str(ori_exception_info[0])\
                 + '\ncrashfile: ' + str(e.__traceback__.tb_next.tb_frame.f_globals['__file__'])\
-                + '\nfunc name: ' + e.__traceback__.tb_next.tb_frame.f_locals['fn_name']\
                 + '\nline: ' + str(e.__traceback__.tb_next.tb_lineno)
 
             e.args = tuple(ori_exception_info)
-            except_result = except_func(e)
+            except_result = exc_func(e)
             return True, try_results, except_result, else_result
 
     if else_func is not None:
