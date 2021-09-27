@@ -13,6 +13,7 @@ from os.path import join as OS_join
 from os.path import exists as OS_exists
 from os.path import isdir as OS_isdir
 from os.path import dirname as OS_dirname
+import re
 from numpy.lib.function_base import iterable
 
 from pathlib2 import Path as Path2
@@ -812,6 +813,25 @@ def get_segments(data):
     assert len(start_pos) == len(end_pos)
     segments_list = [[x + 1, y] for x, y in zip(start_pos, end_pos)]
     return segments_list
+
+
+def try_exc_else(try_func, except_func, else_func=None, developer_mode=False):
+    except_result = try_results = else_result = None
+    crashed = False
+    if developer_mode:
+        try_results = try_func()
+    else:
+        try:
+            try_results = try_func()
+        except Exception as e:
+            crashed = True
+            except_result = except_func(e)
+            return try_results, except_result, else_result
+
+    if else_func is not None:
+        else_result = else_func(try_results)
+
+    return crashed, try_results, except_result, else_result
 
 
 if __name__ == '__main__':
