@@ -654,6 +654,13 @@ def is_number(num):
     return is_float(num) or is_integer(num)
 
 
+def is_bool(data):
+    """
+    是否是 bool 值，返回bool结果
+    """
+    return isinstance(data, bool) or isinstance(data, np.bool_)
+
+
 def whether_divisible_by(to_be_divided, dividing):
     """
     to_be_divided 是否可以被 dividing 整除，返回bool结果
