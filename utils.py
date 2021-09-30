@@ -351,8 +351,10 @@ class MyEncoder(json.JSONEncoder):
             return float(obj)
         elif isinstance(obj, np.ndarray):
             return obj.tolist()
-        if isinstance(obj, np.bool_):
+        elif isinstance(obj, np.bool_):
             return bool(obj)
+        elif isinstance(obj, Path) or isinstance(obj, Path2):
+            return str(obj)
         else:
             return super(MyEncoder, self).default(obj)
 
