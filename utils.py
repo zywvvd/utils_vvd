@@ -851,6 +851,36 @@ def try_exc_handler(try_func, exc_func, developer_mode=False):
     return try_result
 
 
+def class_timer(input_class):
+    class Timmer(input_class):
+        def __getattribute__(self, name: str):
+
+            func = super().__getattribute__(name)
+
+            if str(type(func)) == "<class 'method'>":
+                is_static_method = False
+                try :
+                    func_name = func.__name__
+                except Exception as e:
+                    func_name = func.__func__.__name__
+                    func = func.__func__
+                    is_static_method = True
+
+                @wraps(func)
+                def wrapper(*args, **kwargs):
+                    if is_static_method:
+                        args = args[1:]
+
+                    start_time = time.time()
+                    res = func(*args, **kwargs)
+                    end_time = time.time()
+                    print('func: {_funcname_} runing: {_time_}s'.format(_funcname_=func_name, _time_=format(end_time - start_time, '.6f')))
+                    return res
+                return wrapper
+            return func
+    return Timmer
+
+
 if __name__ == '__main__':
     test_name = 'abc/sadf/gsdf.sadf.test'
     strong_printing(test_name)
