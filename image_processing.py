@@ -345,6 +345,7 @@ def plt_image_show(*image, window_name='image show', array_res=False, full_scree
 
     for index, image_item in enumerate(image_list):
         x_value = None
+        print_name = window_name
         if isinstance(image_item, tuple) or isinstance(image_item, list):
             assert len(image_item) == 2
             image = image_item[0]
@@ -353,10 +354,8 @@ def plt_image_show(*image, window_name='image show', array_res=False, full_scree
                 print_name = current_name
             elif isinstance(image_item[1], np.ndarray):
                 x_value = image_item[1]
-
         else:
             image = image_item
-            print_name = window_name
 
         if iterable(ax):
             if ax.ndim == 1:
