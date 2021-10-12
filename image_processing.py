@@ -393,7 +393,9 @@ def plt_image_show(*image, window_name='image show', array_res=False, full_scree
             pass
         plt.show()
     else:
-        return convert_plt_to_rgb_image(plt)
+        image = convert_plt_to_rgb_image(plt)
+        plt.close()
+        return image
 
 
 def convert_plt_to_rgb_image(plt):
