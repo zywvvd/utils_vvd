@@ -344,14 +344,18 @@ def plt_image_show(*image, window_name='image show', array_res=False, full_scree
     plt.subplots_adjust(top=0.93, bottom=0.05, left=0.05, right=0.95, hspace=0.05, wspace=0.05)
 
     for index, image_item in enumerate(image_list):
+        x_value = None
+        print_name = window_name
         if isinstance(image_item, tuple) or isinstance(image_item, list):
             assert len(image_item) == 2
             image = image_item[0]
-            current_name = image_item[1]
-            print_name = current_name
+            if isinstance(image_item[1], str):
+                current_name = image_item[1]
+                print_name = current_name
+            elif isinstance(image_item[1], np.ndarray):
+                x_value = image_item[1]
         else:
             image = image_item
-            print_name = window_name
 
         if iterable(ax):
             if ax.ndim == 1:
@@ -368,7 +372,10 @@ def plt_image_show(*image, window_name='image show', array_res=False, full_scree
             cur_ax.axis('off')
 
         if image.ndim == 1:
-            cur_ax.plot(image)
+            if x_value is not None and len(image) == len(x_value):
+                cur_ax.plot(x_value, image)
+            else:
+                cur_ax.plot(image)
 
         else:
             if 'uint8' == image.dtype.__str__():
@@ -393,7 +400,9 @@ def plt_image_show(*image, window_name='image show', array_res=False, full_scree
             pass
         plt.show()
     else:
-        return convert_plt_to_rgb_image(plt)
+        image = convert_plt_to_rgb_image(plt)
+        plt.close()
+        return image
 
 
 def convert_plt_to_rgb_image(plt):

@@ -13,6 +13,7 @@ from os.path import join as OS_join
 from os.path import exists as OS_exists
 from os.path import isdir as OS_isdir
 from os.path import dirname as OS_dirname
+import re
 from numpy.lib.function_base import iterable
 
 from pathlib2 import Path as Path2
@@ -350,8 +351,10 @@ class MyEncoder(json.JSONEncoder):
             return float(obj)
         elif isinstance(obj, np.ndarray):
             return obj.tolist()
-        if isinstance(obj, np.bool_):
+        elif isinstance(obj, np.bool_):
             return bool(obj)
+        elif isinstance(obj, Path) or isinstance(obj, Path2):
+            return str(obj)
         else:
             return super(MyEncoder, self).default(obj)
 
@@ -653,6 +656,13 @@ def is_number(num):
     return is_float(num) or is_integer(num)
 
 
+def is_bool(data):
+    """
+    是否是 bool 值，返回bool结果
+    """
+    return isinstance(data, bool) or isinstance(data, np.bool_)
+
+
 def whether_divisible_by(to_be_divided, dividing):
     """
     to_be_divided 是否可以被 dividing 整除，返回bool结果
@@ -812,6 +822,65 @@ def get_segments(data):
     assert len(start_pos) == len(end_pos)
     segments_list = [[x + 1, y] for x, y in zip(start_pos, end_pos)]
     return segments_list
+
+
+def try_exc_handler(try_func, exc_func, developer_mode=False):
+    except_result = try_result = None
+
+    if developer_mode:
+        try_result = try_func()
+    else:
+        try:
+            try_result = try_func()
+        except Exception as e:
+            try:
+                ori_exception_info = list(e.args)
+                if len(ori_exception_info) == 0:
+                    ori_exception_info.append('')
+                ori_exception_info[0] = ' ErrorMessage: ' + str(ori_exception_info[0])\
+                    + '\n CrashFile: ' + str(e.__traceback__.tb_next.tb_frame.f_globals['__file__'])\
+                    + '\n Line: ' + str(e.__traceback__.tb_next.tb_lineno)
+
+                e.args = tuple(ori_exception_info)
+                except_result = exc_func(e)
+            except Exception as ee:
+                print("!! exc_func failed.")
+                print(f"!! error message: {str(ee)}")
+                print("!! we can only return the previous exception info.")
+                except_result = str(e)
+            return except_result
+
+    return try_result
+
+
+def class_timer(input_class):
+    class Timmer(input_class):
+        def __getattribute__(self, name: str):
+
+            func = super().__getattribute__(name)
+
+            if str(type(func)) == "<class 'method'>":
+                is_static_method = False
+                try :
+                    func_name = func.__name__
+                except Exception as e:
+                    func_name = func.__func__.__name__
+                    func = func.__func__
+                    is_static_method = True
+
+                @wraps(func)
+                def wrapper(*args, **kwargs):
+                    if is_static_method:
+                        args = args[1:]
+
+                    start_time = time.time()
+                    res = func(*args, **kwargs)
+                    end_time = time.time()
+                    print('func: {_funcname_} runing: {_time_}s'.format(_funcname_=func_name, _time_=format(end_time - start_time, '.6f')))
+                    return res
+                return wrapper
+            return func
+    return Timmer
 
 
 if __name__ == '__main__':
