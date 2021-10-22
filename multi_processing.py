@@ -28,18 +28,23 @@ def single_process(main_fun, paras, share_list, share_lock, total_size, start_ti
 
 
 def multi_process(main_fun, para_fun, total_size, max_pool_num=8, catch_exception=True):
-    mp_manager = Manager()
-    share_list = mp_manager.list()
-    share_lock = mp_manager.Lock()
     start_time = time.time()
-    pool = Pool(max_pool_num)
-    pbar = tqdm(range(total_size))
-    for index in range(total_size):
-        paras = para_fun(index)
-        pool.apply_async(func=single_process, args=(main_fun, paras, share_list, share_lock, total_size, start_time, catch_exception))
-    pool.close()
-    pool.join()
-    result_list = list(share_list)
+    if max_pool_num > 0:
+        mp_manager = Manager()
+        share_list = mp_manager.list()
+        share_lock = mp_manager.Lock()
+        pool = Pool(max_pool_num)
+        for index in range(total_size):
+            paras = para_fun(index)
+            pool.apply_async(func=single_process, args=(main_fun, paras, share_list, share_lock, total_size, start_time, catch_exception))
+        pool.close()
+        pool.join()
+        result_list = list(share_list)
+    else:
+        result_list = list()
+        for index in range(total_size):
+            res = main_fun(para_fun(index))
+            result_list.append(res)
     print(f"mean time {(time.time() - start_time) / len(result_list)}")
     return result_list
 
